@@ -1,7 +1,5 @@
 # Reform
 
-## Introduction
-
 A plugin aimed to automate common code formatting tasks.
 
 The only thing it does now reforms css properties clause
@@ -29,3 +27,11 @@ git clone https://github.com/Suor/sublime-reform.git
 ```
 
 Bind a shortcut to `css_reform` command.
+
+## TODO
+
+- don't spoil anything when out of props clause
+- preserve cursor position
+- support css comments
+- support css hacks
+- text-wrapping variant
