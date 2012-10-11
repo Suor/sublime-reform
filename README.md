@@ -14,7 +14,7 @@ from column-style to single line and vice versa.
 
 ```bash
 cd ~/.config/sublime-text-2/Packages
-git clone https://github.com/Suor/sublime-reform.git
+git clone https://github.com/Suor/sublime-reform.git Reform
 ```
 
 Use `Ctrl + .` to reform your css.
@@ -23,7 +23,7 @@ Use `Ctrl + .` to reform your css.
 
 ```bash
 cd ~/Library/Application Support/Sublime Text 2/Packages
-git clone https://github.com/Suor/sublime-reform.git
+git clone https://github.com/Suor/sublime-reform.git Reform
 ```
 
 Bind a shortcut to `css_reform` command.
