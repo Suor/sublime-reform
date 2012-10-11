@@ -48,6 +48,15 @@ def line_props(props):
 def parse_props(css):
     # NOTE: wastes anything unmatched, can miss some text,
     #       css comments also work weird
+    """
+    css     = (comment | rule | junk)*
+    comment = "/*" .* "*/"
+    rule    = name ":" values (";" | $ | "/*")
+    name    = \S+
+    values  = (comment | value)+
+    value   = ???
+    junk    = \S+
+    """
     return re.findall(r'([\w-]+)\s*:\s*([^;}]+?)\s*(?:[;}]|$)', css)
 
 
