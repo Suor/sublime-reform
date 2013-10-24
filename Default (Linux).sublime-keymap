@@ -1,4 +1,5 @@
 [
 	// { "keys": ["ctrl+."], "command": "css_reform" }
-    { "keys": ["alt+up"], "command": "select_func" }
+    { "keys": ["alt+up"], "command": "select_func" },
+    { "keys": ["alt+down"], "command": "select_down" }
 ]

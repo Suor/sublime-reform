@@ -4,8 +4,13 @@ import sublime, sublime_plugin
 from .viewtools import region_before_pos, cursor_pos
 
 
+SELECT_STACK = []
+
+
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        SELECT_STACK.append(list(self.view.sel()))
+
         region = self.func_region()
         if region:
             self.view.sel().clear()
@@ -26,6 +31,15 @@ class SelectFuncCommand(sublime_plugin.TextCommand):
             return None
         else:
             return re.search(r'(\w+)\.\w+$', syntax_file).group(1).lower()
+
+
+class SelectDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if SELECT_STACK:
+            regions = SELECT_STACK.pop()
+            self.view.sel().clear()
+            self.view.sel().add_all(regions)
+            self.view.show(self.view.sel())
 
 
 # Find regions funcs
