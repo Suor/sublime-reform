@@ -17,20 +17,11 @@ class SelectFuncCommand(sublime_plugin.TextCommand):
             self.view.sel().add(region)
             self.view.show(region)
 
-
     def func_region(self):
         regions = python_find(self.view)
         current_region = region_before_pos(regions, cursor_pos(self.view))
         if current_region:
             return expand_indented(self.view, current_region)
-
-    @property
-    def syntax(self):
-        syntax_file = self.view.settings().get('syntax')
-        if not syntax_file:
-            return None
-        else:
-            return re.search(r'(\w+)\.\w+$', syntax_file).group(1).lower()
 
 
 class SelectDownCommand(sublime_plugin.TextCommand):
