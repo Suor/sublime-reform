@@ -1,6 +1,9 @@
 import re
 import sublime, sublime_plugin
 
+from .viewtools import region_before_pos, cursor_pos
+
+
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         region = self.func_region()
@@ -12,7 +15,7 @@ class SelectFuncCommand(sublime_plugin.TextCommand):
 
     def func_region(self):
         regions = python_find(self.view)
-        current_region = select_current(self.view, regions)
+        current_region = region_before_pos(regions, cursor_pos(self.view))
         if current_region:
             return expand_indented(self.view, current_region)
 
@@ -38,23 +41,11 @@ def expand_indented(view, region):
     indented = view.indented_region(region.end() + 1)
     return region.cover(indented)
 
-def select_current(view, regions):
-    pos = view.sel()[0].begin()
-    before_pos = lambda r: r.begin() <= pos
-    return last(before_pos, regions)
 
 ### Tools
 
-from itertools import ifilter
-
-def first(cond, coll):
-    return next(ifilter(cond, coll), None)
-
-def last(cond, coll):
-    return first(cond, reversed(coll))
-
-def remove(cond, coll):
-    return filter(complement(cond), coll)
+def remove(cond, seq):
+    return filter(complement(cond), seq)
 
 def complement(func):
     return lambda *a, **kw: not func(*a, **kw)
