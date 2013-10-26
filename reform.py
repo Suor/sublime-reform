@@ -2,14 +2,19 @@
 import re
 import sublime, sublime_plugin
 
+from .viewtools import set_selection, cursor_pos, word_at, word_after, swap_regions
+
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть!"               \
 #   + u"Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
-class ReformCommand(sublime_plugin.TextCommand):
+class MoveWordRightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.insert(edit, 0, "Hello, World!")
+        pos = cursor_pos(self.view)
+        word1 = word_at(self.view, pos)
+        word2 = word_after(self.view, pos)
+        swap_regions(self.view, edit, word1, word2)
 
 # TODO
 #  - Move functions up and down
@@ -21,3 +26,5 @@ class ReformCommand(sublime_plugin.TextCommand):
 #  - Reform multiline list, set, dict comprehensions and generator expressions
 #  - Reform for loop to list comprehension
 #  - Switch brackets - parentheses - whatever
+#
+#  - Move words, code blocks and such

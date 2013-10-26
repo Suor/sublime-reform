@@ -7,7 +7,7 @@ import sublime
 ### Cursor and regions
 
 def cursor_pos(view):
-    return view.sel()[0].begin()
+    return view.sel()[0].end()
 
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)
@@ -20,6 +20,41 @@ def line_start(view, pos=None):
 
 def line_start_str(view):
     return view.substr(line_start(view))
+
+def word_at(view, pos):
+    if view.classify(pos) & sublime.CLASS_WORD_START:
+        start = pos
+    else:
+        start = view.find_by_class(pos, False, sublime.CLASS_WORD_START)
+    return view.word(start)
+
+def word_after(view, pos):
+    start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
+    return view.word(start)
+
+def swap_regions(view, edit, region1, region2):
+    str1 = view.substr(region1)
+    str2 = view.substr(region2)
+    view.replace(edit, region2, str1)
+    view.replace(edit, region1, str2)
+
+
+
+# def word_at_pos(view, pos=None):
+#     if pos is None:
+#         pos = cursor_pos(view)
+#     line = view.line()
+#
+
+### Selection
+
+def set_selection(view, region):
+    view.sel().clear()
+    if iterable(region):
+        view.sel().add_all(region)
+    else:
+        view.sel().add(region)
+    view.show(view.sel())
 
 
 ### Scope
@@ -41,3 +76,10 @@ def parse_scope(scope_name):
 
 def first(seq):
     return next(iter(seq), None)
+
+from collections import Iterable
+
+def isa(*types):
+    return lambda x: isinstance(x, types)
+
+iterable = isa(Iterable)
