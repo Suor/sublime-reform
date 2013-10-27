@@ -16,6 +16,14 @@ class MoveWordRightCommand(sublime_plugin.TextCommand):
         word2 = word_after(self.view, pos)
         swap_regions(self.view, edit, word1, word2)
 
+
+class ReformTestCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        sel = self.view.sel()
+        for region in sel:
+            sel.subtract(region)
+            sel.add(sublime.Region(region.a + 1, region.b + 1))
+
 # TODO
 #  - Move functions up and down
 #  - Break long lines

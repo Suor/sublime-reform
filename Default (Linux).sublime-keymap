@@ -2,5 +2,6 @@
 	// { "keys": ["ctrl+."], "command": "css_reform" }
     { "keys": ["alt+up"], "command": "select_func" },
     { "keys": ["alt+down"], "command": "select_down" },
-    { "keys": ["ctrl+alt+."], "command": "move_word_right" }
+    { "keys": ["ctrl+alt+."], "command": "move_word_right" },
+    { "keys": ["alt+."], "command": "reform_test" }
 ]
