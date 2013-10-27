@@ -7,7 +7,7 @@ import sublime
 ### Cursor and regions
 
 def cursor_pos(view):
-    return view.sel()[0].end()
+    return view.sel()[0].b
 
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)
