@@ -11,10 +11,12 @@ from .viewtools import set_selection, cursor_pos, word_at, word_after, swap_regi
 
 class MoveWordRightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        pos = cursor_pos(self.view)
-        word1 = word_at(self.view, pos)
-        word2 = word_after(self.view, pos)
-        swap_regions(self.view, edit, word1, word2)
+        # We go from right to left to correctly handle overlapping regions
+        for s in reversed(self.view.sel()):
+            pos = s.b
+            word1 = word_at(self.view, pos)
+            word2 = word_after(self.view, pos)
+            swap_regions(self.view, edit, word1, word2)
 
 
 class ReformTestCommand(sublime_plugin.TextCommand):
