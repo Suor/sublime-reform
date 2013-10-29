@@ -41,6 +41,7 @@ class MoveBlockUpCommand(sublime_plugin.TextCommand):
         this_block = region_before_pos(blocks, pos)
         prev_block = region_before_pos(blocks, this_block.begin() - 1)
         swap_regions(self.view, edit, prev_block, this_block)
+        self.view.show(prev_block)
 
 class MoveBlockDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -51,6 +52,7 @@ class MoveBlockDownCommand(sublime_plugin.TextCommand):
         this_block = region_before_pos(blocks, pos)
         next_block = region_after_pos(blocks, this_block.end())
         swap_regions(self.view, edit, this_block, next_block)
+        self.view.show(next_block)
 
 
 class ReformTestCommand(sublime_plugin.TextCommand):
