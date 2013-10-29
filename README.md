@@ -1,9 +1,12 @@
 # Reform
 
-A plugin aimed to automate common code formatting tasks.
+A plugin aimed to automate common code formatting tasks. For now it can:
 
-The only thing it does now reforms css properties clause
-from column-style to single line and vice versa.
+- move word at cursor left and right
+- move non-empty-line block up or down
+
+See Linux shortcuts in `Default (Linux).sublime-keymap`. Bind your own for other systems.
+
 
 **CAUTION** Severe alpha! Use at your own risk!
 
@@ -17,21 +20,9 @@ cd ~/.config/sublime-text-2/Packages
 git clone https://github.com/Suor/sublime-reform.git Reform
 ```
 
-Use `Ctrl + .` to reform your css.
-
 ### On Mac ###
 
 ```bash
 cd ~/Library/Application Support/Sublime Text 2/Packages
 git clone https://github.com/Suor/sublime-reform.git Reform
 ```
-
-Bind a shortcut to `css_reform` command.
-
-## TODO
-
-- don't spoil anything when out of props clause
-- preserve cursor position
-- support css comments
-- support css hacks
-- text-wrapping variant
