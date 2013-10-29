@@ -2,7 +2,8 @@
 import re
 import sublime, sublime_plugin
 
-from .viewtools import set_selection, cursor_pos, word_at, word_after, swap_regions
+from .viewtools import set_selection, cursor_pos, \
+     word_at, word_after, word_before, swap_regions
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
@@ -17,6 +18,15 @@ class MoveWordRightCommand(sublime_plugin.TextCommand):
             word1 = word_at(self.view, pos)
             word2 = word_after(self.view, pos)
             swap_regions(self.view, edit, word1, word2)
+
+class MoveWordLeftCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        for s in self.view.sel():
+            pos = s.b
+            word1 = word_at(self.view, pos)
+            word2 = word_before(self.view, pos)
+            swap_regions(self.view, edit, word2, word1)
+
 
 
 class ReformTestCommand(sublime_plugin.TextCommand):

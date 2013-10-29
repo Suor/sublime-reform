@@ -32,6 +32,10 @@ def word_after(view, pos):
     start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
     return view.word(start)
 
+def word_before(view, pos):
+    end = view.find_by_class(pos, False, sublime.CLASS_WORD_END)
+    return view.word(end)
+
 
 def swap_regions(view, edit, region1, region2):
     assert region1.b <= region2.a
@@ -43,6 +47,9 @@ def swap_regions(view, edit, region1, region2):
         if region1.contains(region):
             sel.subtract(region)
             regions.append(shifted_region(region, region2.b - region1.b))
+        elif region2.contains(region):
+            sel.subtract(region)
+            regions.append(shifted_region(region, region1.a - region2.a))
 
     # swap text
     str1 = view.substr(region1)
