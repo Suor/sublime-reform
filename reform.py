@@ -64,7 +64,12 @@ class ReformTestCommand(sublime_plugin.TextCommand):
         # set_selection(self.view, [this_block, next_block])
         swap_regions(self.view, edit, this_block, next_block)
 
-# TODO
+
+#  DONE:
+#  - Move words and code blocks
+#
+# TODO:
+#  - Better move block commands
 #  - Move functions up and down
 #  - Break long lines
 #  - Reform dicts (object literals) from one-line to multi-line and back
@@ -74,5 +79,3 @@ class ReformTestCommand(sublime_plugin.TextCommand):
 #  - Reform multiline list, set, dict comprehensions and generator expressions
 #  - Reform for loop to list comprehension
 #  - Switch brackets - parentheses - whatever
-#
-#  - Move words, code blocks and such
