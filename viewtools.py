@@ -4,22 +4,31 @@ A collection of tools to deal with scopes and text in sublime view.
 import sublime
 
 
-### Cursor and regions
+### Cursor and selection
 
 def cursor_pos(view):
     return view.sel()[0].b
 
+def set_cursor(view, pos):
+    set_selection(view, sublime.Region(pos, pos))
+
+def set_selection(view, region):
+    view.sel().clear()
+    if iterable(region):
+        view.sel().add_all(region)
+    else:
+        view.sel().add(region)
+    view.show(view.sel())
+
+
+### Regions
+
+# def full_region(view):
+#     return sublime.Region(0, view.size())
+
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)
 
-def line_start(view, pos=None):
-    if pos is None:
-        pos = cursor_pos(view)
-    line = view.line(pos)
-    return sublime.Region(line.begin(), pos)
-
-def line_start_str(view):
-    return view.substr(line_start(view))
 def region_after_pos(regions, pos):
     return first(r for r in regions if r.begin() >= pos)
 
@@ -80,26 +89,8 @@ def swap_regions(view, edit, region1, region2):
     # set cursor position/selection to match moved regions
     sel.add_all(regions)
 
-
 def shifted_region(region, shift):
     return sublime.Region(region.a + shift, region.b + shift)
-
-
-# def word_at_pos(view, pos=None):
-#     if pos is None:
-#         pos = cursor_pos(view)
-#     line = view.line()
-#
-
-### Selection
-
-def set_selection(view, region):
-    view.sel().clear()
-    if iterable(region):
-        view.sel().add_all(region)
-    else:
-        view.sel().add(region)
-    view.show(view.sel())
 
 
 ### Scope
@@ -122,9 +113,8 @@ def parse_scope(scope_name):
 def first(seq):
     return next(iter(seq), None)
 
-from collections import Iterable
-
 def isa(*types):
     return lambda x: isinstance(x, types)
 
+from collections import Iterable
 iterable = isa(Iterable)
