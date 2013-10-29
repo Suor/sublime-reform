@@ -2,8 +2,12 @@
 import re
 import sublime, sublime_plugin
 
-from .viewtools import set_selection, cursor_pos, \
-     word_at, word_after, word_before, swap_regions
+from .viewtools import (
+    set_selection, cursor_pos, set_cursor,
+    word_at, word_after, word_before, swap_regions,
+    region_before_pos, region_after_pos,
+    invert_regions
+)
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
@@ -28,13 +32,37 @@ class MoveWordLeftCommand(sublime_plugin.TextCommand):
             swap_regions(self.view, edit, word2, word1)
 
 
+class MoveBlockUpCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        empty_lines = self.view.find_all(r'^\s*\n')
+        blocks = invert_regions(self.view, empty_lines)
+
+        pos = cursor_pos(self.view)
+        this_block = region_before_pos(blocks, pos)
+        prev_block = region_before_pos(blocks, this_block.begin() - 1)
+        swap_regions(self.view, edit, prev_block, this_block)
+
+class MoveBlockDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        empty_lines = self.view.find_all(r'^\s*\n')
+        blocks = invert_regions(self.view, empty_lines)
+
+        pos = cursor_pos(self.view)
+        this_block = region_before_pos(blocks, pos)
+        next_block = region_after_pos(blocks, this_block.end())
+        swap_regions(self.view, edit, this_block, next_block)
+
 
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        sel = self.view.sel()
-        for region in sel:
-            sel.subtract(region)
-            sel.add(sublime.Region(region.a + 1, region.b + 1))
+        empty_lines = self.view.find_all(r'^\s*\n')
+        blocks = invert_regions(self.view, empty_lines)
+
+        pos = cursor_pos(self.view)
+        this_block = region_before_pos(blocks, pos)
+        next_block = region_after_pos(blocks, this_block.end())
+        # set_selection(self.view, [this_block, next_block])
+        swap_regions(self.view, edit, this_block, next_block)
 
 # TODO
 #  - Move functions up and down

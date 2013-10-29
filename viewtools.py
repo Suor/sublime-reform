@@ -20,6 +20,26 @@ def line_start(view, pos=None):
 
 def line_start_str(view):
     return view.substr(line_start(view))
+def region_after_pos(regions, pos):
+    return first(r for r in regions if r.begin() >= pos)
+
+def invert_regions(view, regions):
+    # NOTE: regions should be non-overlapping and ordered,
+    #       no check here for performance reasons
+    start = 0
+    end = view.size()
+    result = []
+
+    for r in regions:
+        if r.a > start:
+            result.append(sublime.Region(start, r.a))
+        start = r.b
+
+    if start < end:
+        result.append(sublime.Region(start, end))
+
+    return result
+
 
 def word_at(view, pos):
     if view.classify(pos) & sublime.CLASS_WORD_START:
