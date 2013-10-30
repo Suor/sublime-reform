@@ -23,8 +23,8 @@ def set_selection(view, region):
 
 ### Regions
 
-# def full_region(view):
-#     return sublime.Region(0, view.size())
+def full_region(view):
+    return sublime.Region(0, view.size())
 
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)

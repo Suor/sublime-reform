@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-import re
 import sublime, sublime_plugin
+import re
+from itertools import chain, takewhile
+from functools import reduce
 
 from .viewtools import (
     set_selection, cursor_pos, set_cursor,
     word_at, word_after, word_before, swap_regions,
     region_before_pos, region_after_pos,
-    invert_regions
+    full_region, invert_regions
 )
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
@@ -57,15 +59,52 @@ class MoveBlockDownCommand(sublime_plugin.TextCommand):
 
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        empty_lines = self.view.find_all(r'^\s*\n')
-        blocks = invert_regions(self.view, empty_lines)
-
         pos = cursor_pos(self.view)
-        this_block = region_before_pos(blocks, pos)
-        next_block = region_after_pos(blocks, this_block.end())
-        # set_selection(self.view, [this_block, next_block])
-        swap_regions(self.view, edit, this_block, next_block)
+        block = indented_up(self.view, pos)
+        print(block)
+        # empty_lines = self.view.find_all(r'^\s*\n')
+        # blocks = invert_regions(self.view, empty_lines)
 
+        # this_block = region_before_pos(blocks, pos)
+        # # next_block = region_after_pos(blocks, this_block.end())
+        set_selection(self.view, block)
+        # swap_regions(self.view, edit, this_block, next_block)
+
+
+def indented_up(view, pos):
+    line = non_empty_line_up(view, pos)
+    return view.indented_region(line.a)
+
+def indented_block_up(view, pos):
+    line = non_empty_line_up(view, pos)
+    indent = re_find(r'^[ \t]*', view.substr(line))
+
+    if indent:
+        proper_indented = lambda l: view.substr(l).startswith(indent)
+        lines = chain(
+            takewhile(proper_indented, lines_up(view, line.a)),
+            takewhile(proper_indented, lines_down(view, line.a)),
+        )
+        return cover_regions(lines)
+    else:
+        # This is mere optimization
+        return full_region(view)
+
+def non_empty_line_up(view, pos):
+    return first(l for l in lines_up(view, pos) if not re_test(r'^\s*$', view.substr(l)))
+
+def lines_up(view, pos):
+    while pos:
+        yield view.full_line(pos)
+        pos = view.find_by_class(pos, False, sublime.CLASS_LINE_END)
+
+def lines_down(view, pos):
+    while pos < view.size():
+        yield view.full_line(pos)
+        pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+
+def cover_regions(regions):
+    return reduce(sublime.Region.cover, regions)
 
 #  DONE:
 #  - Move words and code blocks
@@ -73,6 +112,7 @@ class ReformTestCommand(sublime_plugin.TextCommand):
 # TODO:
 #  - Better move block commands
 #  - Move functions up and down
+#  - Select blocks, scopes, functions and classes
 #  - Break long lines
 #  - Reform dicts (object literals) from one-line to multi-line and back
 #  - Same for calls, calls with keyword arguments, array literals
@@ -81,3 +121,67 @@ class ReformTestCommand(sublime_plugin.TextCommand):
 #  - Reform multiline list, set, dict comprehensions and generator expressions
 #  - Reform for loop to list comprehension
 #  - Switch brackets - parentheses - whatever
+
+
+### funcy seqs
+
+def first(seq):
+    return next(iter(seq), None)
+
+
+### funcy strings
+
+from operator import methodcaller
+
+def _make_getter(regex):
+    if regex.groups == 0:
+        return methodcaller('group')
+    elif regex.groups == 1 and regex.groupindex == {}:
+        return methodcaller('group', 1)
+    elif regex.groupindex == {}:
+        return methodcaller('groups')
+    elif regex.groups == len(regex.groupindex):
+        return methodcaller('groupdict')
+    else:
+        return identity
+
+_re_type = type(re.compile(r''))
+
+def _prepare(regex, flags):
+    if not isinstance(regex, _re_type):
+        regex = re.compile(regex, flags)
+    return regex, _make_getter(regex)
+
+
+def re_all(regex, s, flags=0):
+    return list(re_iter(regex, s, flags))
+
+def re_find(regex, s, flags=0):
+    return re_finder(regex, flags)(s)
+
+def re_test(regex, s, flags=0):
+    return re_tester(regex, flags)(s)
+
+
+def re_finder(regex, flags=0):
+    regex, getter = _prepare(regex, flags)
+    return lambda s: iffy(getter)(regex.search(s))
+
+def re_tester(regex, flags=0):
+    return lambda s: bool(re.search(regex, s, flags))
+
+
+### funcy funcs
+
+EMPTY = object()
+
+def identity(x):
+    return x
+
+def iffy(pred, action=EMPTY, default=identity):
+    if action is EMPTY:
+        return iffy(bool, pred)
+    else:
+        return lambda v: action(v)  if pred(v) else           \
+                         default(v) if callable(default) else \
+                         default
