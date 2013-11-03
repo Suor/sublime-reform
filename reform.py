@@ -4,6 +4,25 @@ import re
 from itertools import chain, takewhile
 from functools import reduce
 
+#  DONE:
+#  - Move words and code blocks
+#  - Delete block
+#
+# TODO:
+#  - Better move block commands
+#  - Delete empty lines when delete block
+#  - Smarter empty line handling when moving blocks
+#  - Move functions up and down
+#  - Select blocks, scopes, functions and classes
+#  - Break long lines
+#  - Reform dicts (object literals) from one-line to multi-line and back
+#  - Same for calls, calls with keyword arguments, array literals
+#  - Break long strings, several variants including switching to multiline separators
+#  - Align =, =>, :, \ and other punctuation
+#  - Reform multiline list, set, dict comprehensions and generator expressions
+#  - Reform for loop to list comprehension
+#  - Switch brackets - parentheses - whatever
+
 from .viewtools import (
     source,
     set_selection, cursor_pos, set_cursor,
@@ -26,6 +45,7 @@ class MoveWordRightCommand(sublime_plugin.TextCommand):
             word2 = word_after(self.view, pos)
             swap_regions(self.view, edit, word1, word2)
 
+
 class MoveWordLeftCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         for s in self.view.sel():
@@ -33,7 +53,6 @@ class MoveWordLeftCommand(sublime_plugin.TextCommand):
             word1 = word_at(self.view, pos)
             word2 = word_before(self.view, pos)
             swap_regions(self.view, edit, word2, word1)
-
 
 class MoveBlockUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -62,10 +81,10 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
         empty_lines = self.view.find_all(r'^\s*\n')
         blocks = invert_regions(self.view, empty_lines)
 
+
         pos = cursor_pos(self.view)
         this_block = region_before_pos(blocks, pos)
         self.view.erase(edit, this_block)
-
 
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -143,22 +162,6 @@ def lines_down(view, pos):
 
 def cover_regions(regions):
     return reduce(sublime.Region.cover, regions)
-
-#  DONE:
-#  - Move words and code blocks
-#
-# TODO:
-#  - Better move block commands
-#  - Move functions up and down
-#  - Select blocks, scopes, functions and classes
-#  - Break long lines
-#  - Reform dicts (object literals) from one-line to multi-line and back
-#  - Same for calls, calls with keyword arguments, array literals
-#  - Break long strings, several variants including switching to multiline separators
-#  - Align =, =>, :, \ and other punctuation
-#  - Reform multiline list, set, dict comprehensions and generator expressions
-#  - Reform for loop to list comprehension
-#  - Switch brackets - parentheses - whatever
 
 
 ### funcy seqs
