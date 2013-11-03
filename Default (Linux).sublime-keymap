@@ -6,5 +6,6 @@
     { "keys": ["ctrl+alt+."], "command": "move_word_left" },
     { "keys": ["ctrl+alt+;"], "command": "move_block_up" },
     { "keys": ["ctrl+alt+'"], "command": "move_block_down" },
+    { "keys": ["ctrl+alt+d"], "command": "delete_block" },
     { "keys": ["alt+."], "command": "reform_test" }
 ]

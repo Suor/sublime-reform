@@ -4,6 +4,7 @@ A plugin aimed to automate common code formatting tasks. For now it can:
 
 - move word at cursor left and right
 - move non-empty-line block up or down
+- delete non-empty-line block at cursor
 
 See Linux shortcuts in `Default (Linux).sublime-keymap`. Bind your own for other systems.
 

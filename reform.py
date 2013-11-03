@@ -5,6 +5,7 @@ from itertools import chain, takewhile
 from functools import reduce
 
 from .viewtools import (
+    source,
     set_selection, cursor_pos, set_cursor,
     word_at, word_after, word_before, swap_regions,
     region_before_pos, region_after_pos,
@@ -56,6 +57,15 @@ class MoveBlockDownCommand(sublime_plugin.TextCommand):
         swap_regions(self.view, edit, this_block, next_block)
         self.view.show(next_block)
 
+class DeleteBlockCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        empty_lines = self.view.find_all(r'^\s*\n')
+        blocks = invert_regions(self.view, empty_lines)
+
+        pos = cursor_pos(self.view)
+        this_block = region_before_pos(blocks, pos)
+        self.view.erase(edit, this_block)
+
 
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -70,6 +80,34 @@ class ReformTestCommand(sublime_plugin.TextCommand):
         set_selection(self.view, block)
         # swap_regions(self.view, edit, this_block, next_block)
 
+# TODO: deal with lambdas somehow
+def function_up(view, pos):
+    func_def = function_def_up(view, pos)
+
+    lang = source(view)
+    if lang == 'python':
+        next_line = view.find_by_class(func_def.end(), True, sublime.CLASS_LINE_START)
+        return func_def.cover(view.indented_region(next_line))
+    elif lang == 'js':
+        start_bracket = view.find(r'{', func_def.end(), sublime.LITERAL)
+        end_bracket = find_matching_bracket(view, start_bracket)
+        return func_def.cover(end_bracket)
+    else:
+        return func_def
+
+def find_matching_bracket(view, bracket):
+    count = 1
+    while count > 0 and bracket.a != -1:
+        bracket = view.find(r'[{}]', bracket.b)
+        if view.substr(bracket) == '{':
+            count += 1
+        else:
+            count -= 1
+    return bracket
+
+def function_def_up(view, pos):
+    funcs = view.find_by_selector('meta.function')
+    return region_before_pos(funcs, pos)
 
 def indented_up(view, pos):
     line = non_empty_line_up(view, pos)
@@ -87,8 +125,8 @@ def indented_block_up(view, pos):
         )
         return cover_regions(lines)
     else:
-        # This is mere optimization
-        return full_region(view)
+        # No point in selecting everything
+        return sublime.Region(pos, pos)
 
 def non_empty_line_up(view, pos):
     return first(l for l in lines_up(view, pos) if not re_test(r'^\s*$', view.substr(l)))
