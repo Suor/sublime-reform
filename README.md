@@ -17,13 +17,13 @@ See Linux shortcuts in `Default (Linux).sublime-keymap`. Bind your own for other
 ### On Linux ###
 
 ```bash
-cd ~/.config/sublime-text-2/Packages
+cd ~/.config/sublime-text-3/Packages
 git clone https://github.com/Suor/sublime-reform.git Reform
 ```
 
 ### On Mac ###
 
 ```bash
-cd ~/Library/Application Support/Sublime Text 2/Packages
+cd ~/Library/Application Support/Sublime Text 3/Packages
 git clone https://github.com/Suor/sublime-reform.git Reform
 ```
