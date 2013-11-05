@@ -23,6 +23,7 @@ from functools import reduce
 #  - Reform for loop to list comprehension
 #  - Switch brackets - parentheses - whatever
 
+from .funcy import *
 from .viewtools import (
     source,
     set_selection, cursor_pos, set_cursor,
@@ -162,67 +163,3 @@ def lines_down(view, pos):
 
 def cover_regions(regions):
     return reduce(sublime.Region.cover, regions)
-
-
-### funcy seqs
-
-def first(seq):
-    return next(iter(seq), None)
-
-
-### funcy strings
-
-from operator import methodcaller
-
-def _make_getter(regex):
-    if regex.groups == 0:
-        return methodcaller('group')
-    elif regex.groups == 1 and regex.groupindex == {}:
-        return methodcaller('group', 1)
-    elif regex.groupindex == {}:
-        return methodcaller('groups')
-    elif regex.groups == len(regex.groupindex):
-        return methodcaller('groupdict')
-    else:
-        return identity
-
-_re_type = type(re.compile(r''))
-
-def _prepare(regex, flags):
-    if not isinstance(regex, _re_type):
-        regex = re.compile(regex, flags)
-    return regex, _make_getter(regex)
-
-
-def re_all(regex, s, flags=0):
-    return list(re_iter(regex, s, flags))
-
-def re_find(regex, s, flags=0):
-    return re_finder(regex, flags)(s)
-
-def re_test(regex, s, flags=0):
-    return re_tester(regex, flags)(s)
-
-
-def re_finder(regex, flags=0):
-    regex, getter = _prepare(regex, flags)
-    return lambda s: iffy(getter)(regex.search(s))
-
-def re_tester(regex, flags=0):
-    return lambda s: bool(re.search(regex, s, flags))
-
-
-### funcy funcs
-
-EMPTY = object()
-
-def identity(x):
-    return x
-
-def iffy(pred, action=EMPTY, default=identity):
-    if action is EMPTY:
-        return iffy(bool, pred)
-    else:
-        return lambda v: action(v)  if pred(v) else           \
-                         default(v) if callable(default) else \
-                         default

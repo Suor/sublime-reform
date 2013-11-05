@@ -113,8 +113,3 @@ def parse_scope(scope_name):
 def first(seq):
     return next(iter(seq), None)
 
-def isa(*types):
-    return lambda x: isinstance(x, types)
-
-from collections import Iterable
-iterable = isa(Iterable)
