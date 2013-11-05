@@ -7,10 +7,13 @@ from functools import reduce
 #  DONE:
 #  - Move words and code blocks
 #  - Delete block
+#  - Move cursor up and down by functions and classes
 #
 # TODO:
-#  - Better move block commands
 #  - Delete empty lines when delete block
+#  - Move by blocks not in functions
+#  - Separate move cursor/block for function/class?
+#  - Better move block commands
 #  - Smarter empty line handling when moving blocks
 #  - Move functions up and down
 #  - Select blocks, scopes, functions and classes
@@ -26,16 +29,19 @@ from functools import reduce
 from .funcy import *
 from .viewtools import (
     source,
-    set_selection, cursor_pos, set_cursor,
+    cursor_pos, set_cursor,
     word_at, word_after, word_before, swap_regions,
     region_before_pos, region_after_pos,
-    full_region, invert_regions
+    full_region, invert_regions, order_regions,
+
+    region_up, region_down
 )
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть!"               \
 #   + u"Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
+
 
 class MoveWordRightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -46,7 +52,6 @@ class MoveWordRightCommand(sublime_plugin.TextCommand):
             word2 = word_after(self.view, pos)
             swap_regions(self.view, edit, word1, word2)
 
-
 class MoveWordLeftCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         for s in self.view.sel():
@@ -54,6 +59,7 @@ class MoveWordLeftCommand(sublime_plugin.TextCommand):
             word1 = word_at(self.view, pos)
             word2 = word_before(self.view, pos)
             swap_regions(self.view, edit, word2, word1)
+
 
 class MoveBlockUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -82,23 +88,71 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
         empty_lines = self.view.find_all(r'^\s*\n')
         blocks = invert_regions(self.view, empty_lines)
 
-
         pos = cursor_pos(self.view)
         this_block = region_before_pos(blocks, pos)
         self.view.erase(edit, this_block)
 
+
+class SmartUpCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        funcs = find_functions(self.view)
+        classes = self.view.find_by_selector('meta.class')
+        regions = order_regions(funcs + classes)
+
+        def smart_up(region):
+            target = region_up(regions, region.end())
+            if target is not None:
+                return target.begin()
+            else:
+                return region
+
+        map_selection(self.view, smart_up)
+
+class SmartDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        funcs = find_functions(self.view)
+        classes = self.view.find_by_selector('meta.class')
+        regions = order_regions(funcs + classes)
+
+        def unit_down(region):
+            print('region', region)
+            target = region_down(regions, region.end())
+            if target is not None:
+                print('target', target)
+                return target.begin()
+            else:
+                return region
+
+        map_selection(self.view, unit_down)
+
+
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        pos = cursor_pos(self.view)
-        block = indented_up(self.view, pos)
-        print(block)
-        # empty_lines = self.view.find_all(r'^\s*\n')
-        # blocks = invert_regions(self.view, empty_lines)
+        pass
 
-        # this_block = region_before_pos(blocks, pos)
-        # # next_block = region_after_pos(blocks, this_block.end())
-        set_selection(self.view, block)
-        # swap_regions(self.view, edit, this_block, next_block)
+
+def find_functions(view):
+    funcs = view.find_by_selector('meta.function')
+    if source(view) == 'python':
+        is_lambda = lambda r: view.substr(r).startswith('lambda')
+        funcs = lremove(is_lambda, funcs)
+    return funcs
+
+
+def map_selection(view, f):
+    set_selection(view, map(f, view.sel()))
+
+def set_selection(view, region):
+    if iterable(region):
+        region = list(region)
+
+    view.sel().clear()
+    if iterable(region):
+        view.sel().add_all(region)
+    else:
+        view.sel().add(region)
+    view.show(view.sel())
+
 
 # TODO: deal with lambdas somehow
 def function_up(view, pos):
@@ -127,7 +181,7 @@ def find_matching_bracket(view, bracket):
 
 def function_def_up(view, pos):
     funcs = view.find_by_selector('meta.function')
-    return region_before_pos(funcs, pos)
+    return region_up(funcs, pos)
 
 def indented_up(view, pos):
     line = non_empty_line_up(view, pos)

@@ -12,13 +12,6 @@ def cursor_pos(view):
 def set_cursor(view, pos):
     set_selection(view, sublime.Region(pos, pos))
 
-def set_selection(view, region):
-    view.sel().clear()
-    if iterable(region):
-        view.sel().add_all(region)
-    else:
-        view.sel().add(region)
-    view.show(view.sel())
 
 
 ### Regions
@@ -26,11 +19,22 @@ def set_selection(view, region):
 def full_region(view):
     return sublime.Region(0, view.size())
 
+def region_up(regions, pos):
+    return first(r for r in reversed(list(regions)) if r.end() < pos)
+
+def region_down(regions, pos):
+    return first(r for r in regions if r.begin() > pos)
+
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)
 
 def region_after_pos(regions, pos):
     return first(r for r in regions if r.begin() >= pos)
+
+
+def order_regions(regions):
+    order = lambda r: (r.begin(), r.end())
+    return sorted(regions, key=order)
 
 def invert_regions(view, regions):
     # NOTE: regions should be non-overlapping and ordered,

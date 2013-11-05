@@ -2,6 +2,7 @@
 
 A plugin aimed to automate common code formatting tasks. For now it can:
 
+- move cursor up/down a function/class
 - move word at cursor left and right
 - move non-empty-line block up or down
 - delete non-empty-line block at cursor
