@@ -10,6 +10,8 @@ from functools import reduce
 #  - Move cursor up and down by functions and classes
 #
 # TODO:
+#  - extract subexpression to assignment
+#  - wrap/unwrap expression in function
 #  - Delete empty lines when delete block
 #  - Move by blocks not in functions
 #  - Separate move cursor/block for function/class?
