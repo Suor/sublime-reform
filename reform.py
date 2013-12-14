@@ -12,6 +12,7 @@ from functools import reduce
 #  - Wrap expression in function call
 #
 # TODO:
+#  - like Ctrl+D/Alt-F3 but respect word boundaries and case. Also, select all withing scope
 #  - extract subexpression to assignment
 #  - unwrap expression in function
 #  - Delete empty lines when delete block
