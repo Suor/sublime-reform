@@ -10,5 +10,6 @@
     { "keys": ["ctrl+alt+;"], "command": "move_block_up" },
     { "keys": ["ctrl+alt+'"], "command": "move_block_down" },
     { "keys": ["ctrl+alt+d"], "command": "delete_block" },
+    { "keys": ["ctrl+alt+a"], "command": "select_block" },
     { "keys": ["alt+."], "command": "reform_test" }
 ]

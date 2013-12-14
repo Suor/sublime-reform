@@ -92,6 +92,15 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
         this_block = region_before_pos(blocks, pos)
         self.view.erase(edit, this_block)
 
+class SelectBlockCommand(sublime_plugin.TextCommand):
+     def run(self, edit):
+        empty_lines = self.view.find_all(r'^\s*\n')
+        blocks = invert_regions(self.view, empty_lines)
+
+        pos = cursor_pos(self.view)
+        this_block = region_before_pos(blocks, pos)
+        set_selection(self.view, this_block)
+
 
 class SmartUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
