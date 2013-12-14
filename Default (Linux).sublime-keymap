@@ -1,5 +1,5 @@
 [
-	// { "keys": ["ctrl+."], "command": "css_reform" }
+    // { "keys": ["ctrl+."], "command": "css_reform" }
     { "keys": ["ctrl+shift+;"], "command": "select_func" },
     { "keys": ["ctrl+shift+'"], "command": "select_down" },
 

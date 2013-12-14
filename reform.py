@@ -84,7 +84,7 @@ class MoveBlockDownCommand(sublime_plugin.TextCommand):
         self.view.show(next_block)
 
 class DeleteBlockCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+     def run(self, edit):
         empty_lines = self.view.find_all(r'^\s*\n')
         blocks = invert_regions(self.view, empty_lines)
 
