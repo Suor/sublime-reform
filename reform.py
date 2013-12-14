@@ -7,11 +7,13 @@ from functools import reduce
 #  DONE:
 #  - Move words and code blocks
 #  - Delete block
+#  - Select block
 #  - Move cursor up and down by functions and classes
+#  - Wrap expression in function call
 #
 # TODO:
 #  - extract subexpression to assignment
-#  - wrap/unwrap expression in function
+#  - unwrap expression in function
 #  - Delete empty lines when delete block
 #  - Move by blocks not in functions
 #  - Separate move cursor/block for function/class?
@@ -137,9 +139,57 @@ class SmartDownCommand(sublime_plugin.TextCommand):
         map_selection(self.view, unit_down)
 
 
+class EncallCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        new_sels = []
+        for s in self.view.sel():
+            line = self.view.line(s.b)
+            line_str = self.view.substr(line)
+            m = match_around(r'[\w\.]+', line_str, s.b - line.begin())
+            if m:
+                r = sublime.Region(m[0] + line.begin(), m[1] + line.begin())
+                s = self.view.substr(r)
+                self.view.replace(edit, r, '(%s)' % s)
+                new_sels.append(r.begin())
+
+        set_selection(self.view, new_sels)
+
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        pass
+        new_sels = []
+        for s in self.view.sel():
+            line = self.view.line(s.b)
+            line_str = self.view.substr(line)
+            m = match_around(r'[\w\.]+', line_str, s.b - line.begin())
+            if m:
+                r = sublime.Region(m[0] + line.begin(), m[1] + line.begin())
+                s = self.view.substr(r)
+                # set_selection(self.view, r)
+                self.view.replace(edit, r, '(%s)' % s)
+                new_sels.append(r.begin())
+            # exprs = re.findall(r'[\w\.]+', line_str)
+
+        # print('hi')
+        set_selection(self.view, new_sels)
+
+
+_re_type = type(re.compile(r''))
+
+def match_around(regex, s, pos):
+    if not isinstance(regex, _re_type):
+        regex = re.compile(regex)
+
+    p = 0
+    m = None
+    while p <= pos:
+        m = regex.search(s, p)
+        if not m or m.start() <= pos <= m.end():
+            break
+        else:
+            p = m.end()
+
+    return (m.start(), m.end()) if m else None
+
 
 
 def find_functions(view):

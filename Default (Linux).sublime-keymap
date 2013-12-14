@@ -11,5 +11,8 @@
     { "keys": ["ctrl+alt+'"], "command": "move_block_down" },
     { "keys": ["ctrl+alt+d"], "command": "delete_block" },
     { "keys": ["ctrl+alt+a"], "command": "select_block" },
+    { "keys": ["alt+c"], "command": "encall", "context": [
+        { "key": "setting.is_widget", "operator": "equal", "operand": false}
+    ]},
     { "keys": ["alt+."], "command": "reform_test" }
 ]
