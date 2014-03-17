@@ -196,8 +196,8 @@ def match_around(regex, s, pos):
 def find_functions(view):
     funcs = view.find_by_selector('meta.function')
     if source(view) == 'python':
-        is_lambda = lambda r: view.substr(r).startswith('lambda')
-        funcs = lremove(is_lambda, funcs)
+        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
+        funcs = lremove(is_junk, funcs)
     return funcs
 
 
