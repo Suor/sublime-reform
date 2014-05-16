@@ -170,12 +170,11 @@ class ExtractExprCommand(sublime_plugin.TextCommand):
         exracted_line = '{} = {}\n'.format(prefix, expr)
 
         # Modify text
-        self.view.erase(edit, sel)
         self.view.insert(edit, line.begin(), exracted_line)
 
-        # Create 2 cursors for name
-        print([line.begin() + len(prefix), len(exracted_line) + pos])
-        set_cursor(self.view, [line.begin() + len(prefix), len(exracted_line) + pos])
+        # Create cursor for name
+        name_pos = line.begin() + len(prefix)
+        self.view.sel().add(sublime.Region(name_pos, name_pos))
 
 
 class ReformTestCommand(sublime_plugin.TextCommand):
