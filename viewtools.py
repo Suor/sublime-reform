@@ -2,6 +2,7 @@
 A collection of tools to deal with scopes and text in sublime view.
 """
 import sublime
+from .funcy import *
 
 
 ### Cursor and selection
@@ -10,8 +11,25 @@ def cursor_pos(view):
     return view.sel()[0].b
 
 def set_cursor(view, pos):
-    set_selection(view, sublime.Region(pos, pos))
+    if iterable(pos):
+        regions = [sublime.Region(p, p) for p in pos]
+    else:
+        regions = sublime.Region(pos, pos)
+    set_selection(view, regions)
 
+def map_selection(view, f):
+    set_selection(view, map(f, view.sel()))
+
+def set_selection(view, region):
+    if iterable(region):
+        region = list(region)
+
+    view.sel().clear()
+    if iterable(region):
+        view.sel().add_all(region)
+    else:
+        view.sel().add(region)
+    view.show(view.sel())
 
 
 ### Regions

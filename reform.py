@@ -155,6 +155,29 @@ class EncallCommand(sublime_plugin.TextCommand):
 
         set_selection(self.view, new_sels)
 
+
+class ExtractExprCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # Get expression
+        sel = self.view.sel()[0]
+        pos = sel.begin()
+        expr = self.view.substr(sel)
+
+        # Prepare new line
+        line = self.view.line(pos)
+        line_str = self.view.substr(line)
+        prefix = re_find(r'^\s*', line_str)
+        exracted_line = '{} = {}\n'.format(prefix, expr)
+
+        # Modify text
+        self.view.erase(edit, sel)
+        self.view.insert(edit, line.begin(), exracted_line)
+
+        # Create 2 cursors for name
+        print([line.begin() + len(prefix), len(exracted_line) + pos])
+        set_cursor(self.view, [line.begin() + len(prefix), len(exracted_line) + pos])
+
+
 class ReformTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         new_sels = []
@@ -199,21 +222,6 @@ def find_functions(view):
         is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
-
-
-def map_selection(view, f):
-    set_selection(view, map(f, view.sel()))
-
-def set_selection(view, region):
-    if iterable(region):
-        region = list(region)
-
-    view.sel().clear()
-    if iterable(region):
-        view.sel().add_all(region)
-    else:
-        view.sel().add(region)
-    view.show(view.sel())
 
 
 # TODO: deal with lambdas somehow

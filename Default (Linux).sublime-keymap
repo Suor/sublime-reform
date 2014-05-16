@@ -14,5 +14,8 @@
     { "keys": ["alt+c"], "command": "encall", "context": [
         { "key": "setting.is_widget", "operator": "equal", "operand": false}
     ]},
+    { "keys": ["alt+a"], "command": "extract_expr", "context": [
+        { "key": "setting.is_widget", "operator": "equal", "operand": false}
+    ]},
     { "keys": ["alt+."], "command": "reform_test" }
 ]
