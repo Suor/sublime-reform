@@ -17,5 +17,5 @@
     { "keys": ["alt+enter"], "command": "extract_expr", "context": [
         { "key": "setting.is_widget", "operator": "equal", "operand": false}
     ]},
-    { "keys": ["alt+."], "command": "reform_test" }
+    { "keys": ["alt+."], "command": "scopes_test" }
 ]
