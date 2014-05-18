@@ -35,6 +35,8 @@ from .funcy import *
 from .viewtools import (
     source,
     cursor_pos, set_cursor,
+    map_selection, set_selection,
+
     word_at, word_after, word_before, swap_regions,
     region_before_pos, region_after_pos,
     full_region, invert_regions, order_regions,
