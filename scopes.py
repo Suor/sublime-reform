@@ -5,7 +5,7 @@ from .funcy import *
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # print 1 , asd
-        region = block_at(self.view, cursor_pos(self.view))
+        region = func_at(self.view, cursor_pos(self.view))
         # region = blocks(self.view)
         # region = word_expand(self.view, cursor_pos(self.view))
         if region:
@@ -57,6 +57,37 @@ def blocks(view):
     return invert_regions(view, empty_lines)
 
 
+def func_at(view, pos):
+    defs = _func_defs(view)
+    if source(view, pos) == 'python':
+        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
+        defs = lremove(is_junk, defs)
+    func_def = region_b(defs, pos)
+
+    lang = source(view, pos)
+    if lang == 'python':
+        next_line = view.find_by_class(func_def.end(), True, sublime.CLASS_LINE_START)
+        return func_def.cover(view.indented_region(next_line))
+    elif lang == 'js':
+        start_bracket = view.find(r'{', func_def.end(), sublime.LITERAL)
+        end_bracket = find_matching_bracket(view, start_bracket)
+        return func_def.cover(end_bracket)
+    else:
+        return func_def
+
+def find_matching_bracket(view, bracket):
+    count = 1
+    while count > 0 and bracket.a != -1:
+        bracket = view.find(r'[{}]', bracket.b)
+        if view.substr(bracket) == '{':
+            count += 1
+        else:
+            count -= 1
+    return bracket
+
+def _func_defs(view):
+    return view.find_by_selector('meta.function')
+
 
 ### Regions
 
@@ -86,6 +117,22 @@ def invert_regions(view, regions):
 
     return result
 
+
+### Scope
+
+def scope_name(view, pos=None):
+    if pos is None:
+        pos = cursor_pos(view)
+    return view.scope_name(pos)
+
+def parsed_scope(view, pos=None):
+    return parse_scope(scope_name(view, pos))
+
+def source(view, pos=None):
+    return first(vec[1] for vec in parsed_scope(view, pos) if vec[0] == 'source')
+
+def parse_scope(scope_name):
+    return [name.split('.') for name in scope_name.split()]
 
 
 ### Utils
