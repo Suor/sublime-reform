@@ -44,11 +44,30 @@ def line_end(view, pos):
 
 
 def block_at(view, pos):
-    return view.expand_by_class(pos, sublime.CLASS_EMPTY_LINE)
+    return region_at(blocks(views), pos)
+
+def block_b(view, pos):
+    return region_b(blocks(views), pos)
+
+def block_f(view, pos):
+    return region_f(blocks(views), pos)
 
 def blocks(view):
     empty_lines = view.find_all(r'^\s*\n')
     return invert_regions(view, empty_lines)
+
+
+
+### Regions
+
+def region_at(regions, pos):
+    return first(r for r in regions if r.a <= pos < r.b)
+
+def region_b(regions, pos):
+    return first(r for r in reversed(regions) if r.a <= pos)
+
+def region_f(regions, pos):
+    return first(r for r in regions if pos < r.b)
 
 def invert_regions(view, regions):
     # NOTE: regions should be non-overlapping and ordered,
