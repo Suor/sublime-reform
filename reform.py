@@ -131,10 +131,8 @@ class SmartDownCommand(sublime_plugin.TextCommand):
         regions = order_regions(funcs + classes)
 
         def unit_down(region):
-            print('region', region)
             target = region_down(regions, region.end())
             if target is not None:
-                print('target', target)
                 return target.begin()
             else:
                 return region
