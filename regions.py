@@ -7,7 +7,7 @@ from .viewtools import region_before_pos, cursor_pos
 SELECT_STACK = []
 
 
-class SelectFuncCommand(sublime_plugin.TextCommand):
+class _SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         SELECT_STACK.append(list(self.view.sel()))
 
