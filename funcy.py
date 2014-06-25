@@ -7,6 +7,17 @@ from operator import methodcaller
 def first(seq):
     return next(iter(seq), None)
 
+def last(seq):
+    try:
+        return seq[-1]
+    except IndexError:
+        return None
+    except TypeError:
+        item = None
+        for item in seq:
+            pass
+        return item
+
 def remove(pred, seq):
     return filter(complement(pred), seq)
 

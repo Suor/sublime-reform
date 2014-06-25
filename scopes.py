@@ -4,6 +4,32 @@ from .funcy import *
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        print('test')
+
+class FindWordForwardCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pos = cursor_pos(self.view)
+        region = word_at(self.view, pos)
+        word = self.view.substr(region)
+
+        all_regions = self.view.find_all(r'\b%s\b' % word)
+        next_region = region_f(all_regions, region.end()) or first(all_regions)
+
+        set_cursor(self.view, pos + next_region.begin() - region.begin())
+
+class FindWordBackCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pos = cursor_pos(self.view)
+        region = word_at(self.view, pos)
+        word = self.view.substr(region)
+
+        all_regions = self.view.find_all(r'\b%s\b' % word)
+        next_region = region_b(all_regions, region.begin()-1) or last(all_regions)
+
+        set_cursor(self.view, pos + next_region.begin() - region.begin())
+
+class SelectFuncCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
         # print 1 , asd
         region = func_at(self.view, cursor_pos(self.view))
         # region = blocks(self.view)
@@ -139,6 +165,13 @@ def parse_scope(scope_name):
 
 def cursor_pos(view):
     return view.sel()[0].b
+
+def set_cursor(view, pos):
+    if iterable(pos):
+        regions = [sublime.Region(p, p) for p in pos]
+    else:
+        regions = sublime.Region(pos, pos)
+    set_selection(view, regions)
 
 def set_selection(view, region):
     if iterable(region):
