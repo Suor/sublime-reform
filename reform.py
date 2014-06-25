@@ -41,7 +41,9 @@ from .viewtools import (
     region_before_pos, region_after_pos,
     full_region, invert_regions, order_regions,
 
-    region_up, region_down
+    region_up, region_down,
+
+    expand_min_gap
 )
 
 # s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
@@ -97,7 +99,7 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
 
         pos = cursor_pos(self.view)
         this_block = region_before_pos(blocks, pos)
-        self.view.erase(edit, this_block)
+        self.view.erase(edit, expand_min_gap(self.view, this_block))
 
 class SelectBlockCommand(sublime_plugin.TextCommand):
      def run(self, edit):

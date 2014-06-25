@@ -130,8 +130,21 @@ def parse_scope(scope_name):
     return [name.split('.') for name in scope_name.split()]
 
 
-### Funcy tools
+### Smarts
 
-def first(seq):
-    return next(iter(seq), None)
 
+def expand_min_gap(view, region):
+    """
+    Expands region so that it will cover minimum gap of empty lines around it.
+    """
+    empty_lines = view.find_all(r'^\s*\n')
+    empty_neighbours = [r for r in empty_lines
+                          if r.end() == region.begin() or r.begin() == region.end()]
+
+    if not empty_neighbours:
+        return region
+    elif len(empty_neighbours) == 1:
+        return region.cover(empty_neighbours[0])
+    else:
+        min_gap = min(empty_neighbours, key=lambda r: view.substr(r).count('\n'))
+        return region.cover(min_gap)
