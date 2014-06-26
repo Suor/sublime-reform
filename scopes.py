@@ -1,6 +1,13 @@
 import sublime, sublime_plugin
 from .funcy import *
 
+# Free Ctrl-*:
+# - Ctrl-K (heavily used)
+# - Ctrl-,
+# - Ctrl-'
+# Less used:
+# - Ctrl-E
+
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
