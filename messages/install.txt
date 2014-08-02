@@ -1,0 +1,3 @@
+See full list of available commands and key bindings here:
+
+https://github.com/Suor/sublime-reform
