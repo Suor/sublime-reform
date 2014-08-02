@@ -6,6 +6,7 @@ from .funcy import *
 from .viewtools import (
     cursor_pos, list_cursors, set_cursor,
     set_selection,
+    source,
 
     word_at, word_b, word_f,
     block_at, list_blocks,
@@ -124,6 +125,11 @@ class EncallCommand(sublime_plugin.TextCommand):
 
 
 class ExtractExprCommand(sublime_plugin.TextCommand):
+    TEMPLATES = {
+        'js': ('var  = {};\n', 4)
+    }
+    DEFAULT = (' = {}\n', 0)
+
     def run(self, edit):
         # Get expression
         sel = self.view.sel()[0]
@@ -134,13 +140,14 @@ class ExtractExprCommand(sublime_plugin.TextCommand):
         line = self.view.line(pos)
         line_str = self.view.substr(line)
         prefix = re_find(r'^\s*', line_str)
-        exracted_line = '{} = {}\n'.format(prefix, expr)
+        template, cursor_shift = self.TEMPLATES.get(source(self.view, pos), self.DEFAULT)
+        exracted_line = prefix + template.format(expr)
 
         # Modify text
         self.view.insert(edit, line.begin(), exracted_line)
 
         # Create cursor for name
-        name_pos = line.begin() + len(prefix)
+        name_pos = line.begin() + len(prefix) + cursor_shift
         self.view.sel().add(sublime.Region(name_pos, name_pos))
 
 
