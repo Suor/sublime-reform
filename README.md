@@ -21,7 +21,7 @@ select_func       | --           | Select function at cursor<sup>2</sup>
 extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>3</sup>
 
 
-<sup>*</<sup> Current key bindings are very experimental, especially on OS X. <br>
+<sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
 <sup>1</sup> Block is a blob of text surrounded with empty lines. <br>
 <sup>2</sup> Works for python, js. <br>
 <sup>3</sup> Works for python, js, ruby. <br>
