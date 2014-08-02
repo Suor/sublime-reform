@@ -1,0 +1,17 @@
+[
+    { "keys": ["ctrl+up"], "command": "find_word_up" },
+    { "keys": ["ctrl+down"], "command": "find_word_down" },
+    { "keys": ["alt+up"], "command": "smart_up" },
+    { "keys": ["alt+down"], "command": "smart_down" },
+
+    { "keys": ["ctrl+alt+/"], "command": "move_word_right" },
+    { "keys": ["ctrl+alt+."], "command": "move_word_left" },
+    { "keys": ["ctrl+alt+;"], "command": "move_block_up" },
+    { "keys": ["ctrl+alt+'"], "command": "move_block_down" },
+
+    { "keys": ["ctrl+shift+;"], "command": "select_func" },
+    { "keys": ["ctrl+alt+d"], "command": "delete_block" },
+    { "keys": ["alt+enter"], "command": "extract_expr", "context": [
+        { "key": "setting.is_widget", "operator": "equal", "operand": false}
+    ]}
+]
