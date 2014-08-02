@@ -29,6 +29,7 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print('test')
 
+
 class FindWordForwardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
@@ -38,7 +39,7 @@ class FindWordForwardCommand(sublime_plugin.TextCommand):
         all_regions = self.view.find_all(r'\b%s\b' % word)
         next_region = region_f(all_regions, region.end()) or first(all_regions)
 
-        set_cursor(self.view, pos + next_region.begin() - region.begin())
+        set_cursor(self.view, next_region.begin())
 
 class FindWordBackCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -47,9 +48,10 @@ class FindWordBackCommand(sublime_plugin.TextCommand):
         word = self.view.substr(region)
 
         all_regions = self.view.find_all(r'\b%s\b' % word)
-        next_region = region_b(all_regions, region.begin()-1) or last(all_regions)
+        next_region = region_b(all_regions, region.begin() - 1) or last(all_regions)
 
-        set_cursor(self.view, pos + next_region.begin() - region.begin())
+        set_cursor(self.view, next_region.begin())
+
 
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
