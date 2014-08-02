@@ -10,6 +10,9 @@ from .funcy import *
 def cursor_pos(view):
     return view.sel()[0].b
 
+def list_cursors(view):
+    return [s.b for s in view.sel()]
+
 def set_cursor(view, pos):
     if iterable(pos):
         regions = [sublime.Region(p, p) for p in pos]
@@ -30,6 +33,23 @@ def set_selection(view, region):
     else:
         view.sel().add(region)
     view.show(view.sel())
+
+
+### Words
+
+def word_at(view, pos):
+    if view.classify(pos) & (512 | sublime.CLASS_WORD_START | sublime.CLASS_WORD_END):
+        return view.word(pos)
+
+def word_b(view, pos):
+    if view.classify(pos) & sublime.CLASS_WORD_START:
+        pos -= 1
+    start = view.find_by_class(pos, False, sublime.CLASS_WORD_START)
+    return view.word(start)
+
+def word_f(view, pos):
+    start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
+    return view.word(start)
 
 
 ### Regions
@@ -70,23 +90,6 @@ def invert_regions(view, regions):
         result.append(sublime.Region(start, end))
 
     return result
-
-
-def word_at(view, pos):
-    if view.classify(pos) & sublime.CLASS_WORD_START:
-        start = pos
-    else:
-        start = view.find_by_class(pos, False, sublime.CLASS_WORD_START)
-    return view.word(start)
-
-def word_after(view, pos):
-    start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
-    return view.word(start)
-
-def word_before(view, pos):
-    end = view.find_by_class(pos, False, sublime.CLASS_WORD_END)
-    return view.word(end)
-
 
 def swap_regions(view, edit, region1, region2):
     assert region1.b <= region2.a

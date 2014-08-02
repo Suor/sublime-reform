@@ -2,9 +2,10 @@ import sublime, sublime_plugin
 from .funcy import *
 
 from .viewtools import (
-    cursor_pos, set_cursor, set_selection, map_selection,
+    cursor_pos, list_cursors, set_cursor, set_selection, map_selection,
     source,
     order_regions,
+    word_at,
 )
 
 
@@ -100,28 +101,6 @@ class SelectBlockCommand(sublime_plugin.TextCommand):
      def run(self, edit):
         blocks = [block_at(self.view, p) for p in list_cursors(self.view)]
         set_selection(self.view, blocks)
-
-
-def list_cursors(view):
-    return [s.b for s in view.sel()]
-
-
-def word_at(view, pos):
-    if view.classify(pos) & (512 | sublime.CLASS_WORD_START | sublime.CLASS_WORD_END):
-        return view.word(pos)
-
-def word_b(view, pos):
-    if view.classify(pos) & sublime.CLASS_WORD_START:
-        pos -= 1
-    start = view.find_by_class(pos, False, sublime.CLASS_WORD_START)
-    return view.word(start)
-
-def word_f(view, pos):
-    if view.classify(pos) & sublime.CLASS_WORD_START:
-        start = pos
-    else:
-        start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
-    return view.word(start)
 
 
 def line_at(view, pos):
