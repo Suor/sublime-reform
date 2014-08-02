@@ -83,6 +83,10 @@ def region_after_pos(regions, pos):
     return first(r for r in regions if r.begin() >= pos)
 
 
+def shifted_region(region, shift):
+    return sublime.Region(region.a + shift, region.b + shift)
+
+
 def order_regions(regions):
     order = lambda r: (r.begin(), r.end())
     return sorted(regions, key=order)
@@ -127,9 +131,6 @@ def swap_regions(view, edit, region1, region2):
     # set cursor position/selection to match moved regions
     sel.add_all(regions)
 
-def shifted_region(region, shift):
-    return sublime.Region(region.a + shift, region.b + shift)
-
 
 ### Scope
 
@@ -149,7 +150,6 @@ def parse_scope(scope_name):
 
 
 ### Smarts
-
 
 def expand_min_gap(view, region):
     """
