@@ -32,16 +32,45 @@ import re
 
 from .funcy import *
 from .viewtools import (
-    source,
-    cursor_pos, list_cursors, map_selection, set_selection,
+    cursor_pos, list_cursors, set_cursor,
+    set_selection,
 
     word_at, word_b, word_f,
     block_at, list_blocks,
     region_at, region_b, region_f,
-    swap_regions, invert_regions,
-
-    expand_min_gap
+    swap_regions,
+    expand_min_gap,
 )
+
+
+### Word commands
+
+class FindWordForwardCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pos = cursor_pos(self.view)
+        region = word_at(self.view, pos)
+        if not region:
+            return
+        word = self.view.substr(region)
+
+        all_regions = self.view.find_all(r'\b%s\b' % word)
+        next_region = region_f(all_regions, region.end()) or first(all_regions)
+
+        set_cursor(self.view, next_region.begin())
+
+
+class FindWordBackCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pos = cursor_pos(self.view)
+        region = word_at(self.view, pos)
+        if not region:
+            return
+        word = self.view.substr(region)
+
+        all_regions = self.view.find_all(r'\b%s\b' % word)
+        next_region = region_b(all_regions, region.begin() - 1) or last(all_regions)
+
+        set_cursor(self.view, next_region.begin())
 
 
 class MoveWordRightCommand(sublime_plugin.TextCommand):
@@ -52,12 +81,21 @@ class MoveWordRightCommand(sublime_plugin.TextCommand):
             word2 = word_f(self.view, pos)
             swap_regions(self.view, edit, word1, word2)
 
+
 class MoveWordLeftCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         for pos in list_cursors(self.view):
             word1 = word_at(self.view, pos)
             word2 = word_b(self.view, word1.begin())
             swap_regions(self.view, edit, word2, word1)
+
+
+### Block commands
+
+class SelectBlockCommand(sublime_plugin.TextCommand):
+     def run(self, edit):
+        blocks = [block_at(self.view, p) for p in list_cursors(self.view)]
+        set_selection(self.view, blocks)
 
 
 class MoveBlockUpCommand(sublime_plugin.TextCommand):
@@ -72,6 +110,7 @@ class MoveBlockUpCommand(sublime_plugin.TextCommand):
 
         swap_regions(self.view, edit, prev_block, this_block)
         self.view.show(prev_block)
+
 
 class MoveBlockDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -93,6 +132,8 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
         this_block = block_at(self.view, pos)
         self.view.erase(edit, expand_min_gap(self.view, this_block))
 
+
+### Other commands
 
 class EncallCommand(sublime_plugin.TextCommand):
     def run(self, edit):

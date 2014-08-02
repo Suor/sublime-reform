@@ -2,12 +2,10 @@ import sublime, sublime_plugin
 from .funcy import *
 
 from .viewtools import (
-    cursor_pos, list_cursors, set_cursor, set_selection, map_selection,
+    list_cursors, set_selection, map_selection,
     source,
-    word_at,
-    block_at,
-    region_f, region_b, region_at,
-    order_regions, invert_regions,
+    region_f, region_b,
+    order_regions,
 )
 
 
@@ -37,34 +35,7 @@ from .viewtools import (
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        set_selection(self.view, word_f(self.view, cursor_pos(self.view)))
-
-
-class FindWordForwardCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        pos = cursor_pos(self.view)
-        region = word_at(self.view, pos)
-        if not region:
-            return
-        word = self.view.substr(region)
-
-        all_regions = self.view.find_all(r'\b%s\b' % word)
-        next_region = region_f(all_regions, region.end()) or first(all_regions)
-
-        set_cursor(self.view, next_region.begin())
-
-class FindWordBackCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        pos = cursor_pos(self.view)
-        region = word_at(self.view, pos)
-        if not region:
-            return
-        word = self.view.substr(region)
-
-        all_regions = self.view.find_all(r'\b%s\b' % word)
-        next_region = region_b(all_regions, region.begin() - 1) or last(all_regions)
-
-        set_cursor(self.view, next_region.begin())
+        print("test")
 
 
 class SmartUpCommand(sublime_plugin.TextCommand):
@@ -80,6 +51,7 @@ class SmartUpCommand(sublime_plugin.TextCommand):
 
         map_selection(self.view, smart_up)
 
+
 class SmartDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         funcs = find_functions(self.view)
@@ -93,17 +65,10 @@ class SmartDownCommand(sublime_plugin.TextCommand):
         map_selection(self.view, smart_down)
 
 
-
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         blocks = [func_at(self.view, p) for p in list_cursors(self.view)]
         set_selection(self.view, blocks)
-
-class SelectBlockCommand(sublime_plugin.TextCommand):
-     def run(self, edit):
-        blocks = [block_at(self.view, p) for p in list_cursors(self.view)]
-        set_selection(self.view, blocks)
-
 
 
 def find_functions(view):
