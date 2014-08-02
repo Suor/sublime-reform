@@ -7,6 +7,22 @@ from .funcy import *
 # - Ctrl-'
 # Less used:
 # - Ctrl-E
+#
+#
+#  TODO:
+#  (separate for each language)
+#  - detect function
+#  - detect function scope (func - name - decorators)
+#  - detect class
+#  - detect class scope
+#  - detect block
+#  - detect paragraph (in text or comments)
+#  - choose between paragraph, block, function or class automatically
+#  (language independent)
+#  - select scope
+#  - delete scope
+#  - Ctrl-D enchanced
+#  - select all in scope
 
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
