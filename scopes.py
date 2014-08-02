@@ -55,13 +55,8 @@ class FindWordBackCommand(sublime_plugin.TextCommand):
 
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        # print 1 , asd
-        region = func_at(self.view, cursor_pos(self.view))
-        # region = blocks(self.view)
-        # region = word_expand(self.view, cursor_pos(self.view))
-        if region:
-            set_selection(self.view, region)
-        # print('Test command')
+        blocks = [func_at(self.view, p) for p in list_cursors(self.view)]
+        set_selection(self.view, blocks)
 
 
 def word_at(view, pos):
