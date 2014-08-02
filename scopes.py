@@ -41,6 +41,8 @@ class FindWordForwardCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
         region = word_at(self.view, pos)
+        if not region:
+            return
         word = self.view.substr(region)
 
         all_regions = self.view.find_all(r'\b%s\b' % word)
@@ -52,6 +54,8 @@ class FindWordBackCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
         region = word_at(self.view, pos)
+        if not region:
+            return
         word = self.view.substr(region)
 
         all_regions = self.view.find_all(r'\b%s\b' % word)
