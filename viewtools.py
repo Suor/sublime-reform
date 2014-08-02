@@ -54,6 +54,17 @@ def word_f(view, pos):
 
 ### Lines
 
+def line_at(view, pos):
+    return view.line(pos)
+
+def line_start(view, pos):
+    line = view.line(pos)
+    return sublime.Region(line.begin(), pos)
+
+def line_end(view, pos):
+    line = view.line(pos)
+    return sublime.Region(pos, line.end())
+
 def lines_b(view, pos):
     while pos:
         yield view.full_line(pos)
@@ -65,16 +76,32 @@ def lines_f(view, pos):
         pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
 
 
+### Blocks
+
+def block_at(view, pos):
+    return region_at(blocks(view), pos)
+
+def block_b(view, pos):
+    return region_b(blocks(view), pos)
+
+def block_f(view, pos):
+    return region_f(blocks(view), pos)
+
+def blocks(view):
+    empty_lines = view.find_all(r'^\s*\n')
+    return invert_regions(view, empty_lines)
+
+
 ### Regions
 
-def full_region(view):
-    return sublime.Region(0, view.size())
+def region_at(regions, pos):
+    return first(r for r in regions if r.begin() <= pos <= r.end())
 
-def region_up(regions, pos):
-    return first(r for r in reversed(list(regions)) if r.end() < pos)
+def region_b(regions, pos):
+    return first(r for r in reversed(regions) if r.begin() <= pos)
 
-def region_down(regions, pos):
-    return first(r for r in regions if r.begin() > pos)
+def region_f(regions, pos):
+    return first(r for r in regions if pos < r.begin())
 
 def region_before_pos(regions, pos):
     return first(r for r in reversed(list(regions)) if r.begin() <= pos)
@@ -82,6 +109,9 @@ def region_before_pos(regions, pos):
 def region_after_pos(regions, pos):
     return first(r for r in regions if r.begin() >= pos)
 
+
+def full_region(view):
+    return sublime.Region(0, view.size())
 
 def shifted_region(region, shift):
     return sublime.Region(region.a + shift, region.b + shift)

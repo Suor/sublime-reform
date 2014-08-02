@@ -4,8 +4,10 @@ from .funcy import *
 from .viewtools import (
     cursor_pos, list_cursors, set_cursor, set_selection, map_selection,
     source,
-    order_regions,
     word_at,
+    block_at,
+    region_f, region_b, region_at,
+    order_regions, invert_regions,
 )
 
 
@@ -35,7 +37,7 @@ from .viewtools import (
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        print('test')
+        set_selection(self.view, word_f(self.view, cursor_pos(self.view)))
 
 
 class FindWordForwardCommand(sublime_plugin.TextCommand):
@@ -103,31 +105,6 @@ class SelectBlockCommand(sublime_plugin.TextCommand):
         set_selection(self.view, blocks)
 
 
-def line_at(view, pos):
-    return view.line(pos)
-
-def line_start(view, pos):
-    line = view.line(pos)
-    return sublime.Region(line.begin(), pos)
-
-def line_end(view, pos):
-    line = view.line(pos)
-    return sublime.Region(pos, line.end())
-
-
-def block_at(view, pos):
-    return region_at(blocks(view), pos)
-
-def block_b(view, pos):
-    return region_b(blocks(view), pos)
-
-def block_f(view, pos):
-    return region_f(blocks(view), pos)
-
-def blocks(view):
-    empty_lines = view.find_all(r'^\s*\n')
-    return invert_regions(view, empty_lines)
-
 
 def find_functions(view):
     funcs = view.find_by_selector('meta.function')
@@ -166,32 +143,3 @@ def find_matching_bracket(view, bracket):
 
 def _func_defs(view):
     return view.find_by_selector('meta.function')
-
-
-### Regions
-
-def region_at(regions, pos):
-    return first(r for r in regions if r.begin() <= pos <= r.end())
-
-def region_b(regions, pos):
-    return first(r for r in reversed(regions) if r.begin() <= pos)
-
-def region_f(regions, pos):
-    return first(r for r in regions if pos < r.begin())
-
-def invert_regions(view, regions):
-    # NOTE: regions should be non-overlapping and ordered,
-    #       no check here for performance reasons
-    start = 0
-    end = view.size()
-    result = []
-
-    for r in regions:
-        if r.a > start:
-            result.append(sublime.Region(start, r.a))
-        start = r.b
-
-    if start < end:
-        result.append(sublime.Region(start, end))
-
-    return result
