@@ -33,10 +33,10 @@ import re
 from .funcy import *
 from .viewtools import (
     source,
-    cursor_pos,
-    map_selection, set_selection,
+    cursor_pos, list_cursors, map_selection, set_selection,
 
-    word_at, word_after, word_before, swap_regions,
+    word_at, word_b, word_f,
+    swap_regions,
     region_before_pos, region_after_pos,
     invert_regions,
 
@@ -47,18 +47,16 @@ from .viewtools import (
 class MoveWordRightCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # We go from right to left to correctly handle overlapping regions
-        for s in reversed(self.view.sel()):
-            pos = s.b
+        for pos in reversed(list_cursors(self.view)):
             word1 = word_at(self.view, pos)
-            word2 = word_after(self.view, pos)
+            word2 = word_f(self.view, pos)
             swap_regions(self.view, edit, word1, word2)
 
 class MoveWordLeftCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        for s in self.view.sel():
-            pos = s.b
+        for pos in list_cursors(self.view):
             word1 = word_at(self.view, pos)
-            word2 = word_before(self.view, pos)
+            word2 = word_b(self.view, word1.begin())
             swap_regions(self.view, edit, word2, word1)
 
 
