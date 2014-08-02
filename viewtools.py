@@ -117,14 +117,16 @@ def shifted_region(region, shift):
 
 ### Scope
 
-def scope_name(view):
-    return view.scope_name(cursor_pos(view))
+def scope_name(view, pos=None):
+    if pos is None:
+        pos = cursor_pos(view)
+    return view.scope_name(pos)
 
-def parsed_scope(view):
-    return parse_scope(scope_name(view))
+def parsed_scope(view, pos=None):
+    return parse_scope(scope_name(view, pos))
 
-def source(view):
-    return first(vec[1] for vec in parsed_scope(view) if vec[0] == 'source')
+def source(view, pos=None):
+    return first(vec[1] for vec in parsed_scope(view, pos) if vec[0] == 'source')
 
 def parse_scope(scope_name):
     return [name.split('.') for name in scope_name.split()]

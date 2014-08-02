@@ -1,6 +1,10 @@
 import sublime, sublime_plugin
 from .funcy import *
 
+from .viewtools import (
+    cursor_pos, set_cursor, set_selection, map_selection,
+    source,
+)
 # Free Ctrl-*:
 # - Ctrl-K (heavily used)
 # - Ctrl-,
@@ -162,44 +166,3 @@ def invert_regions(view, regions):
         result.append(sublime.Region(start, end))
 
     return result
-
-
-### Scope
-
-def scope_name(view, pos=None):
-    if pos is None:
-        pos = cursor_pos(view)
-    return view.scope_name(pos)
-
-def parsed_scope(view, pos=None):
-    return parse_scope(scope_name(view, pos))
-
-def source(view, pos=None):
-    return first(vec[1] for vec in parsed_scope(view, pos) if vec[0] == 'source')
-
-def parse_scope(scope_name):
-    return [name.split('.') for name in scope_name.split()]
-
-
-### Utils
-
-def cursor_pos(view):
-    return view.sel()[0].b
-
-def set_cursor(view, pos):
-    if iterable(pos):
-        regions = [sublime.Region(p, p) for p in pos]
-    else:
-        regions = sublime.Region(pos, pos)
-    set_selection(view, regions)
-
-def set_selection(view, region):
-    if iterable(region):
-        region = list(region)
-
-    view.sel().clear()
-    if iterable(region):
-        view.sel().add_all(region)
-    else:
-        view.sel().add(region)
-    view.show(view.sel())
