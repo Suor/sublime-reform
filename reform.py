@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import sublime, sublime_plugin
 import re
-from itertools import chain, takewhile
-from functools import reduce
 
 
 #  DONE:
