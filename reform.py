@@ -179,25 +179,6 @@ class ExtractExprCommand(sublime_plugin.TextCommand):
         self.view.sel().add(sublime.Region(name_pos, name_pos))
 
 
-class ReformTestCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        new_sels = []
-        for s in self.view.sel():
-            line = self.view.line(s.b)
-            line_str = self.view.substr(line)
-            m = match_around(r'[\w\.]+', line_str, s.b - line.begin())
-            if m:
-                r = sublime.Region(m[0] + line.begin(), m[1] + line.begin())
-                s = self.view.substr(r)
-                # set_selection(self.view, r)
-                self.view.replace(edit, r, '(%s)' % s)
-                new_sels.append(r.begin())
-            # exprs = re.findall(r'[\w\.]+', line_str)
-
-        # print('hi')
-        set_selection(self.view, new_sels)
-
-
 _re_type = type(re.compile(r''))
 
 def match_around(regex, s, pos):
@@ -225,66 +206,12 @@ def find_functions(view):
     return funcs
 
 
-# TODO: deal with lambdas somehow
-def function_up(view, pos):
-    func_def = function_def_up(view, pos)
-
-    lang = source(view)
-    if lang == 'python':
-        next_line = view.find_by_class(func_def.end(), True, sublime.CLASS_LINE_START)
-        return func_def.cover(view.indented_region(next_line))
-    elif lang == 'js':
-        start_bracket = view.find(r'{', func_def.end(), sublime.LITERAL)
-        end_bracket = find_matching_bracket(view, start_bracket)
-        return func_def.cover(end_bracket)
-    else:
-        return func_def
-
-def find_matching_bracket(view, bracket):
-    count = 1
-    while count > 0 and bracket.a != -1:
-        bracket = view.find(r'[{}]', bracket.b)
-        if view.substr(bracket) == '{':
-            count += 1
-        else:
-            count -= 1
-    return bracket
-
-def function_def_up(view, pos):
-    funcs = view.find_by_selector('meta.function')
-    return region_up(funcs, pos)
-
-def indented_up(view, pos):
-    line = non_empty_line_up(view, pos)
-    return view.indented_region(line.a)
-
-def indented_block_up(view, pos):
-    line = non_empty_line_up(view, pos)
-    indent = re_find(r'^[ \t]*', view.substr(line))
-
-    if indent:
-        proper_indented = lambda l: view.substr(l).startswith(indent)
-        lines = chain(
-            takewhile(proper_indented, lines_up(view, line.a)),
-            takewhile(proper_indented, lines_down(view, line.a)),
-        )
-        return cover_regions(lines)
-    else:
-        # No point in selecting everything
-        return sublime.Region(pos, pos)
-
-def non_empty_line_up(view, pos):
-    return first(l for l in lines_up(view, pos) if not re_test(r'^\s*$', view.substr(l)))
-
-def lines_up(view, pos):
+def lines_b(view, pos):
     while pos:
         yield view.full_line(pos)
         pos = view.find_by_class(pos, False, sublime.CLASS_LINE_END)
 
-def lines_down(view, pos):
+def lines_f(view, pos):
     while pos < view.size():
         yield view.full_line(pos)
         pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
-
-def cover_regions(regions):
-    return reduce(sublime.Region.cover, regions)
