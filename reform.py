@@ -36,9 +36,9 @@ from .viewtools import (
     cursor_pos, list_cursors, map_selection, set_selection,
 
     word_at, word_b, word_f,
-    swap_regions,
-    region_before_pos, region_after_pos,
-    invert_regions,
+    block_at, list_blocks,
+    region_at, region_b, region_f,
+    swap_regions, invert_regions,
 
     expand_min_gap
 )
@@ -62,33 +62,35 @@ class MoveWordLeftCommand(sublime_plugin.TextCommand):
 
 class MoveBlockUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        empty_lines = self.view.find_all(r'^\s*\n')
-        blocks = invert_regions(self.view, empty_lines)
+        blocks = list_blocks(self.view)
+        this_block = region_at(blocks, cursor_pos(self.view))
+        if not this_block:
+            return
+        prev_block = region_b(blocks, this_block.begin() - 1)
+        if not prev_block:
+            return
 
-        pos = cursor_pos(self.view)
-        this_block = region_before_pos(blocks, pos)
-        prev_block = region_before_pos(blocks, this_block.begin() - 1)
         swap_regions(self.view, edit, prev_block, this_block)
         self.view.show(prev_block)
 
 class MoveBlockDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        empty_lines = self.view.find_all(r'^\s*\n')
-        blocks = invert_regions(self.view, empty_lines)
+        blocks = list_blocks(self.view)
+        this_block = region_at(blocks, cursor_pos(self.view))
+        if not this_block:
+            return
+        next_block = region_f(blocks, this_block.end())
+        if not next_block:
+            return
 
-        pos = cursor_pos(self.view)
-        this_block = region_before_pos(blocks, pos)
-        next_block = region_after_pos(blocks, this_block.end())
         swap_regions(self.view, edit, this_block, next_block)
         self.view.show(next_block)
 
+
 class DeleteBlockCommand(sublime_plugin.TextCommand):
      def run(self, edit):
-        empty_lines = self.view.find_all(r'^\s*\n')
-        blocks = invert_regions(self.view, empty_lines)
-
         pos = cursor_pos(self.view)
-        this_block = region_before_pos(blocks, pos)
+        this_block = block_at(self.view, pos)
         self.view.erase(edit, expand_min_gap(self.view, this_block))
 
 

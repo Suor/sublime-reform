@@ -65,12 +65,12 @@ def line_end(view, pos):
     line = view.line(pos)
     return sublime.Region(pos, line.end())
 
-def lines_b(view, pos):
+def list_lines_b(view, pos):
     while pos:
         yield view.full_line(pos)
         pos = view.find_by_class(pos, False, sublime.CLASS_LINE_END)
 
-def lines_f(view, pos):
+def list_lines_f(view, pos):
     while pos < view.size():
         yield view.full_line(pos)
         pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
@@ -79,15 +79,15 @@ def lines_f(view, pos):
 ### Blocks
 
 def block_at(view, pos):
-    return region_at(blocks(view), pos)
+    return region_at(list_blocks(view), pos)
 
 def block_b(view, pos):
-    return region_b(blocks(view), pos)
+    return region_b(list_blocks(view), pos)
 
 def block_f(view, pos):
-    return region_f(blocks(view), pos)
+    return region_f(list_blocks(view), pos)
 
-def blocks(view):
+def list_blocks(view):
     empty_lines = view.find_all(r'^\s*\n')
     return invert_regions(view, empty_lines)
 
@@ -102,12 +102,6 @@ def region_b(regions, pos):
 
 def region_f(regions, pos):
     return first(r for r in regions if pos < r.begin())
-
-def region_before_pos(regions, pos):
-    return first(r for r in reversed(list(regions)) if r.begin() <= pos)
-
-def region_after_pos(regions, pos):
-    return first(r for r in regions if r.begin() >= pos)
 
 
 def full_region(view):
