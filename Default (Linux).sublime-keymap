@@ -1,6 +1,6 @@
 [
-    { "keys": ["ctrl+up"], "command": "find_word_back" },
-    { "keys": ["ctrl+down"], "command": "find_word_forward" },
+    { "keys": ["ctrl+up"], "command": "find_word_up" },
+    { "keys": ["ctrl+down"], "command": "find_word_down" },
     { "keys": ["alt+up"], "command": "smart_up" },
     { "keys": ["alt+down"], "command": "smart_down" },
 

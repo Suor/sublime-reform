@@ -17,7 +17,7 @@ from .viewtools import (
 
 ### Word commands
 
-class FindWordForwardCommand(sublime_plugin.TextCommand):
+class FindWordDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
         region = word_at(self.view, pos)
@@ -31,7 +31,7 @@ class FindWordForwardCommand(sublime_plugin.TextCommand):
         set_cursor(self.view, next_region.begin())
 
 
-class FindWordBackCommand(sublime_plugin.TextCommand):
+class FindWordUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
         region = word_at(self.view, pos)
