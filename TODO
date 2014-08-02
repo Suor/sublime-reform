@@ -1,0 +1,49 @@
+DONE:
+ - Move word left and right
+ - Select, delete and move block up and down
+ - Move cursor up and down by functions and classes
+ - Find word at cursor up and down
+ - Wrap expression in function call
+ - Extract selected expression to assignment
+
+
+TODO:
+- Like Ctrl+D/Alt-F3 but respect word boundaries and case. Also, select all withing scope
+- Unwrap expression in function
+- Move by blocks not in functions
+- Separate move cursor/block for function/class?
+- Smarter empty line handling when moving blocks?
+- Move functions up and down
+- Select scopes, functions and classes
+- Break long lines
+- Reform dicts (object literals) from one-line to multi-line and back
+- Same for calls, calls with keyword arguments, array literals
+- Break long strings, several variants including switching to multiline separators
+- Align =, =>, :, \ and other punctuation
+- Reform multiline list, set, dict comprehensions and generator expressions
+- Reform for loop to list comprehension
+- Switch brackets - parentheses - whatever
+
+
+Scopes TODO:
+(separate for each language)
+- detect function
+- detect function scope (func - name - decorators)
+- detect class
+- detect class scope
+- detect block
+- detect paragraph (in text or comments)
+- choose between paragraph, block, function or class automatically
+(language independent)
+- select scope
+- delete scope
+- Ctrl-D enchanced
+- select all in scope
+
+
+Free Ctrl-*:
+- Ctrl-K (heavily used)
+- Ctrl-,
+- Ctrl-'
+Less used:
+- Ctrl-E

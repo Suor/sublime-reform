@@ -2,34 +2,6 @@
 import sublime, sublime_plugin
 import re
 
-
-#  DONE:
-#  - Move words and code blocks
-#  - Delete block
-#  - Select block
-#  - Move cursor up and down by functions and classes
-#  - Wrap expression in function call
-#
-# TODO:
-#  - like Ctrl+D/Alt-F3 but respect word boundaries and case. Also, select all withing scope
-#  - extract subexpression to assignment
-#  - unwrap expression in function
-#  - Delete empty lines when delete block
-#  - Move by blocks not in functions
-#  - Separate move cursor/block for function/class?
-#  - Better move block commands
-#  - Smarter empty line handling when moving blocks
-#  - Move functions up and down
-#  - Select blocks, scopes, functions and classes
-#  - Break long lines
-#  - Reform dicts (object literals) from one-line to multi-line and back
-#  - Same for calls, calls with keyword arguments, array literals
-#  - Break long strings, several variants including switching to multiline separators
-#  - Align =, =>, :, \ and other punctuation
-#  - Reform multiline list, set, dict comprehensions and generator expressions
-#  - Reform for loop to list comprehension
-#  - Switch brackets - parentheses - whatever
-
 from .funcy import *
 from .viewtools import (
     cursor_pos, list_cursors, set_cursor,
