@@ -147,14 +147,3 @@ def match_around(regex, s, pos):
             p = m.end()
 
     return (m.start(), m.end()) if m else None
-
-
-def lines_b(view, pos):
-    while pos:
-        yield view.full_line(pos)
-        pos = view.find_by_class(pos, False, sublime.CLASS_LINE_END)
-
-def lines_f(view, pos):
-    while pos < view.size():
-        yield view.full_line(pos)
-        pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)

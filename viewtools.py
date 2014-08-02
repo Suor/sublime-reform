@@ -52,6 +52,19 @@ def word_f(view, pos):
     return view.word(start)
 
 
+### Lines
+
+def lines_b(view, pos):
+    while pos:
+        yield view.full_line(pos)
+        pos = view.find_by_class(pos, False, sublime.CLASS_LINE_END)
+
+def lines_f(view, pos):
+    while pos < view.size():
+        yield view.full_line(pos)
+        pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+
+
 ### Regions
 
 def full_region(view):
