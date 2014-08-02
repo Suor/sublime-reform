@@ -4,7 +4,10 @@ from .funcy import *
 from .viewtools import (
     cursor_pos, set_cursor, set_selection, map_selection,
     source,
+    order_regions,
 )
+
+
 # Free Ctrl-*:
 # - Ctrl-K (heavily used)
 # - Ctrl-,
@@ -57,10 +60,46 @@ class FindWordBackCommand(sublime_plugin.TextCommand):
         set_cursor(self.view, next_region.begin())
 
 
+class SmartUpCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # TODO: jump by selectors in css/less/...
+        funcs = find_functions(self.view)
+        classes = self.view.find_by_selector('meta.class')
+        regions = order_regions(funcs + classes)
+
+        def smart_up(pos):
+            target = region_b(regions, pos.begin() - 1) or last(regions)
+            return target.begin()
+
+        map_selection(self.view, smart_up)
+
+class SmartDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        funcs = find_functions(self.view)
+        classes = self.view.find_by_selector('meta.class')
+        regions = order_regions(funcs + classes)
+
+        def smart_down(region):
+            target = region_f(regions, region.end()) or first(regions)
+            return target.begin()
+
+        map_selection(self.view, smart_down)
+
+
+
 class SelectFuncCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         blocks = [func_at(self.view, p) for p in list_cursors(self.view)]
         set_selection(self.view, blocks)
+
+class SelectBlockCommand(sublime_plugin.TextCommand):
+     def run(self, edit):
+        blocks = [block_at(self.view, p) for p in list_cursors(self.view)]
+        set_selection(self.view, blocks)
+
+
+def list_cursors(view):
+    return [s.b for s in view.sel()]
 
 
 def word_at(view, pos):
@@ -94,18 +133,25 @@ def line_end(view, pos):
 
 
 def block_at(view, pos):
-    return region_at(blocks(views), pos)
+    return region_at(blocks(view), pos)
 
 def block_b(view, pos):
-    return region_b(blocks(views), pos)
+    return region_b(blocks(view), pos)
 
 def block_f(view, pos):
-    return region_f(blocks(views), pos)
+    return region_f(blocks(view), pos)
 
 def blocks(view):
     empty_lines = view.find_all(r'^\s*\n')
     return invert_regions(view, empty_lines)
 
+
+def find_functions(view):
+    funcs = view.find_by_selector('meta.function')
+    if source(view) == 'python':
+        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
+        funcs = lremove(is_junk, funcs)
+    return funcs
 
 def func_at(view, pos):
     defs = _func_defs(view)
@@ -142,13 +188,13 @@ def _func_defs(view):
 ### Regions
 
 def region_at(regions, pos):
-    return first(r for r in regions if r.a <= pos < r.b)
+    return first(r for r in regions if r.begin() <= pos <= r.end())
 
 def region_b(regions, pos):
-    return first(r for r in reversed(regions) if r.a <= pos)
+    return first(r for r in reversed(regions) if r.begin() <= pos)
 
 def region_f(regions, pos):
-    return first(r for r in regions if pos < r.b)
+    return first(r for r in regions if pos < r.begin())
 
 def invert_regions(view, regions):
     # NOTE: regions should be non-overlapping and ordered,

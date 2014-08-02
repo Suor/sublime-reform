@@ -4,6 +4,7 @@ import re
 from itertools import chain, takewhile
 from functools import reduce
 
+
 #  DONE:
 #  - Move words and code blocks
 #  - Delete block
@@ -34,22 +35,15 @@ from functools import reduce
 from .funcy import *
 from .viewtools import (
     source,
-    cursor_pos, set_cursor,
+    cursor_pos,
     map_selection, set_selection,
 
     word_at, word_after, word_before, swap_regions,
     region_before_pos, region_after_pos,
-    full_region, invert_regions, order_regions,
-
-    region_up, region_down,
+    invert_regions,
 
     expand_min_gap
 )
-
-# s = u"Привет, весёлые игрушки, мы пришли вас съесть! Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
-
-# s = u"Привет, весёлые игрушки, мы пришли вас съесть!"               \
-#   + u"Бойтесь кровожадных нас, и прячтесь по углам, закрыв глазки!"
 
 
 class MoveWordRightCommand(sublime_plugin.TextCommand):
@@ -100,46 +94,6 @@ class DeleteBlockCommand(sublime_plugin.TextCommand):
         pos = cursor_pos(self.view)
         this_block = region_before_pos(blocks, pos)
         self.view.erase(edit, expand_min_gap(self.view, this_block))
-
-class SelectBlockCommand(sublime_plugin.TextCommand):
-     def run(self, edit):
-        empty_lines = self.view.find_all(r'^\s*\n')
-        blocks = invert_regions(self.view, empty_lines)
-
-        pos = cursor_pos(self.view)
-        this_block = region_before_pos(blocks, pos)
-        set_selection(self.view, this_block)
-
-
-class SmartUpCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        funcs = find_functions(self.view)
-        classes = self.view.find_by_selector('meta.class')
-        regions = order_regions(funcs + classes)
-
-        def smart_up(region):
-            target = region_up(regions, region.end())
-            if target is not None:
-                return target.begin()
-            else:
-                return region
-
-        map_selection(self.view, smart_up)
-
-class SmartDownCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        funcs = find_functions(self.view)
-        classes = self.view.find_by_selector('meta.class')
-        regions = order_regions(funcs + classes)
-
-        def unit_down(region):
-            target = region_down(regions, region.end())
-            if target is not None:
-                return target.begin()
-            else:
-                return region
-
-        map_selection(self.view, unit_down)
 
 
 class EncallCommand(sublime_plugin.TextCommand):
@@ -195,15 +149,6 @@ def match_around(regex, s, pos):
             p = m.end()
 
     return (m.start(), m.end()) if m else None
-
-
-
-def find_functions(view):
-    funcs = view.find_by_selector('meta.function')
-    if source(view) == 'python':
-        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
-        funcs = lremove(is_junk, funcs)
-    return funcs
 
 
 def lines_b(view, pos):
