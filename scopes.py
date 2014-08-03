@@ -85,6 +85,7 @@ def func_at(view, pos):
 def find_matching_bracket(view, bracket):
     count = 1
     while count > 0 and bracket.a != -1:
+        # TODO: skip brackets in comments and strings
         bracket = view.find(r'[{}]', bracket.b)
         if view.substr(bracket) == '{':
             count += 1
