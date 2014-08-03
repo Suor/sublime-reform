@@ -1,5 +1,5 @@
 import sublime, sublime_plugin
-from .funcy import *
+ST3 = sublime.version() >= '3000'
 
 try:
     from .funcy import *
@@ -22,6 +22,8 @@ except ValueError: # HACK: for ST2 compatability
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print("test")
+        # from .viewtools import word_f, cursor_pos
+        # set_selection(self.view, word_f(self.view, cursor_pos(self.view)))
 
 
 class SmartUpCommand(sublime_plugin.TextCommand):
@@ -73,7 +75,7 @@ def func_at(view, pos):
 
     lang = source(view, pos)
     if lang == 'python':
-        next_line = view.find_by_class(func_def.end(), True, sublime.CLASS_LINE_START)
+        next_line = newline_f(view, func_def.end())
         return func_def.cover(view.indented_region(next_line))
     elif lang == 'js':
         start_bracket = view.find(r'{', func_def.end(), sublime.LITERAL)
@@ -95,3 +97,12 @@ def find_matching_bracket(view, bracket):
 
 def _func_defs(view):
     return view.find_by_selector('meta.function')
+
+
+if ST3:
+    def newline_f(view, pos):
+        return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+else:
+    def newline_f(view, pos):
+        region = view.find(r'\n', pos + 1)
+        return region.end()

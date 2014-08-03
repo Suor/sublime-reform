@@ -140,9 +140,9 @@ class EncallCommand(sublime_plugin.TextCommand):
 
 class ExtractExprCommand(sublime_plugin.TextCommand):
     TEMPLATES = {
-        'js': ('var  = {};\n', 4)
+        'js': ('var  = {0};\n', 4)
     }
-    DEFAULT = (' = {}\n', 0)
+    DEFAULT = (' = {0}\n', 0)
 
     def run(self, edit):
         # Get expression

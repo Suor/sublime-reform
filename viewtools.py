@@ -2,7 +2,8 @@
 A collection of tools to deal with scopes and text in sublime view.
 """
 import sublime
-from .funcy import *
+ST3 = sublime.version() >= '3000'
+
 try:
     from .funcy import *
 except ValueError: # HACK: for ST2 compatability
@@ -28,32 +29,64 @@ def map_selection(view, f):
     set_selection(view, map(f, view.sel()))
 
 def set_selection(view, region):
+    # NOTE: we need to materialize a possible iterator beore clearing selection,
+    #       as mapping selection is a common techique.
     if iterable(region):
         region = list(region)
 
     view.sel().clear()
+    add_selection(view, region)
+    view.show(view.sel())
+
+def add_selection(view, region):
     if iterable(region):
-        view.sel().add_all(region)
+        if ST3:
+            view.sel().add_all(list(region))
+        else:
+            # .add_all() doesn't work with python lists in ST2
+            for r in region:
+                view.sel().add(r)
     else:
         view.sel().add(region)
-    view.show(view.sel())
 
 
 ### Words
 
-def word_at(view, pos):
-    if view.classify(pos) & (512 | sublime.CLASS_WORD_START | sublime.CLASS_WORD_END):
-        return view.word(pos)
+if ST3:
+    def word_at(view, pos):
+        if view.classify(pos) & (512 | sublime.CLASS_WORD_START | sublime.CLASS_WORD_END):
+            return view.word(pos)
 
-def word_b(view, pos):
-    if view.classify(pos) & sublime.CLASS_WORD_START:
+    def word_b(view, pos):
+        start = view.find_by_class(pos - 1, False, sublime.CLASS_WORD_START)
+        return view.word(start)
+
+    def word_f(view, pos):
+        start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
+        return view.word(start)
+else:
+    def _word_at(view, pos):
+        word = view.word(pos)
+        return word, re_test(r'^\w+$', view.substr(word))
+
+    def word_at(view, pos):
+        word, is_word = _word_at(view, pos)
+        if is_word:
+            return word
+
+    def word_b(view, pos):
         pos -= 1
-    start = view.find_by_class(pos, False, sublime.CLASS_WORD_START)
-    return view.word(start)
+        is_word = False
+        while pos and not is_word:
+            word, is_word = _word_at(view, pos - 1)
+            if is_word:
+                return word
+            else:
+                pos = word.begin()
 
-def word_f(view, pos):
-    start = view.find_by_class(pos, True, sublime.CLASS_WORD_START)
-    return view.word(start)
+    def word_f(view, pos):
+        start = view.find(r'\b\w', pos + 1)
+        return view.word(start)
 
 
 ### Lines
@@ -157,7 +190,7 @@ def swap_regions(view, edit, region1, region2):
     view.replace(edit, region1, str2)
 
     # set cursor position/selection to match moved regions
-    sel.add_all(regions)
+    add_selection(view, regions)
 
 
 ### Scope
