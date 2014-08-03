@@ -2,18 +2,32 @@
 import sublime, sublime_plugin
 import re
 
-from .funcy import *
-from .viewtools import (
-    cursor_pos, list_cursors, set_cursor,
-    set_selection,
-    source,
+try:
+    from .funcy import *
+    from .viewtools import (
+        cursor_pos, list_cursors, set_cursor,
+        set_selection,
+        source,
 
-    word_at, word_b, word_f,
-    block_at, list_blocks,
-    region_at, region_b, region_f,
-    swap_regions,
-    expand_min_gap,
-)
+        word_at, word_b, word_f,
+        block_at, list_blocks,
+        region_at, region_b, region_f,
+        swap_regions,
+        expand_min_gap,
+    )
+except ValueError: # HACK: for ST2 compatability
+    from funcy import *
+    from viewtools import (
+        cursor_pos, list_cursors, set_cursor,
+        set_selection,
+        source,
+
+        word_at, word_b, word_f,
+        block_at, list_blocks,
+        region_at, region_b, region_f,
+        swap_regions,
+        expand_min_gap,
+    )
 
 
 ### Word commands

@@ -1,12 +1,22 @@
 import sublime, sublime_plugin
 from .funcy import *
 
-from .viewtools import (
-    list_cursors, set_selection, map_selection,
-    source,
-    region_f, region_b,
-    order_regions,
-)
+try:
+    from .funcy import *
+    from .viewtools import (
+        list_cursors, set_selection, map_selection,
+        source,
+        region_f, region_b,
+        order_regions,
+    )
+except ValueError: # HACK: for ST2 compatability
+    from funcy import *
+    from viewtools import (
+        list_cursors, set_selection, map_selection,
+        source,
+        region_f, region_b,
+        order_regions,
+    )
 
 
 class ScopesTestCommand(sublime_plugin.TextCommand):

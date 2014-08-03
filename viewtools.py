@@ -3,6 +3,10 @@ A collection of tools to deal with scopes and text in sublime view.
 """
 import sublime
 from .funcy import *
+try:
+    from .funcy import *
+except ValueError: # HACK: for ST2 compatability
+    from funcy import *
 
 
 ### Cursor and selection
