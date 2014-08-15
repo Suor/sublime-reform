@@ -29,19 +29,10 @@ extract_expr      | alt+enter    | Extract selected expression into an assignmen
 
 ## Installation
 
-### On Linux
-
-```bash
-cd ~/.config/sublime-text-3/Packages
-git clone https://github.com/Suor/sublime-reform.git Reform
-```
-
-### On Mac
-
-```bash
-cd ~/Library/Application Support/Sublime Text 3/Packages
-git clone https://github.com/Suor/sublime-reform.git Reform
-```
+- [Install Package Control](https://sublime.wbond.net/installation).
+- Bring up the Command Palette with Ctrl+Shift+p (Cmd+Shift+p on OS X).
+- Select "Package Control: Install Package" (it'll take a few seconds).
+- Select or type in "Reform" when the list appears.
 
 
 ## TODO
