@@ -1,9 +1,9 @@
 # Reform
 
-This enables you to move through and reform your code like magic.
+This thing enables you to move through and reform your code like magic.
 At least it aims to do it :)
 
-Here are a list of supported commands:
+Here is a list of supported commands:
 
 Command           | Key binding<sup>*</sup> | Description
 ----------------- | ------------ | ---------------------------------------------------------------
@@ -37,7 +37,7 @@ extract_expr      | alt+enter    | Extract selected expression into an assignmen
 
 ## TODO
 
-And I have plans. Here is a list if you want to help and looking where to start:
+I have plans. Here is a list if you want to help and looking where to start:
 
 - Move functions up and down.
 - Select scopes, functions and classes.
