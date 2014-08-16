@@ -1,0 +1,52 @@
+[
+    {
+        "caption": "Find Word Up",
+        "command": "find_word_up"
+    },
+    {
+        "caption": "Find Word Down",
+        "command": "find_word_down"
+    },
+    {
+        "caption": "Smart Up",
+        "command": "smart_up"
+    },
+    {
+        "caption": "Smart Down",
+        "command": "smart_down"
+    },
+    {
+        "caption": "Move Word Right",
+        "command": "move_word_right"
+    },
+    {
+        "caption": "Move Word Left",
+        "command": "move_word_left"
+    },
+
+    {
+        "caption": "Select Block",
+        "command": "select_block"
+    },
+    {
+        "caption": "Move Block Up",
+        "command": "move_block_up"
+    },
+    {
+        "caption": "Move Block Down",
+        "command": "move_block_down"
+    },
+    {
+        "caption": "Delete Block",
+        "command": "delete_block"
+    },
+
+    {
+        "caption": "Select Func",
+        "command": "select_func"
+    },
+    {
+        "caption": "Extract Expression",
+        "command": "extract_expr"
+    }
+]
