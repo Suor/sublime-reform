@@ -24,7 +24,7 @@ extract_expr      | alt+enter    | Extract selected expression into an assignmen
 <sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
 <sup>1</sup> Block is a blob of text surrounded with empty lines. <br>
 <sup>2</sup> Works for python, js. <br>
-<sup>3</sup> Works for python, js, ruby. <br>
+<sup>3</sup> Works for python, js, ruby, php (and any languages with no keyword to define var).<br>
 
 
 ## Installation
