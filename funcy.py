@@ -24,6 +24,16 @@ def remove(pred, seq):
 def lremove(pred, seq):
     return list(remove(pred, seq))
 
+
+def without(seq, *items):
+    for value in seq:
+        if value not in items:
+            yield value
+
+def lwithout(seq, *items):
+    return list(without(seq, *items))
+
+
 ### funcy strings
 
 def _make_getter(regex):

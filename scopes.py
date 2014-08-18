@@ -30,7 +30,7 @@ class SmartUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # TODO: jump by selectors in css/less/...
         funcs = find_functions(self.view)
-        classes = self.view.find_by_selector('meta.class')
+        classes = find_classes(self.view)
         regions = order_regions(funcs + classes)
 
         def smart_up(pos):
@@ -43,7 +43,7 @@ class SmartUpCommand(sublime_plugin.TextCommand):
 class SmartDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         funcs = find_functions(self.view)
-        classes = self.view.find_by_selector('meta.class')
+        classes = find_classes(self.view)
         regions = order_regions(funcs + classes)
 
         def smart_down(region):
@@ -65,6 +65,12 @@ def find_functions(view):
         is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
+
+def find_classes(view):
+    classes = view.find_by_selector('meta.class')
+    instances = view.find_by_selector('meta.class.instance')
+    return lwithout(classes, *instances)
+
 
 def func_at(view, pos):
     defs = _func_defs(view)
