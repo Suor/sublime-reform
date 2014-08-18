@@ -140,7 +140,8 @@ class EncallCommand(sublime_plugin.TextCommand):
 
 class ExtractExprCommand(sublime_plugin.TextCommand):
     TEMPLATES = {
-        'js': ('var  = {0};\n', 4)
+        'js': ('var  = {0};\n', 4),
+        'php': (' = {0};\n', 0)
     }
     DEFAULT = (' = {0}\n', 0)
 
