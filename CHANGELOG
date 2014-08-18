@@ -1,3 +1,4 @@
+- support non balanced {} in comments and strings
 - added PHP support for extract_expr (Bailey Parker)
 - added plugin commands to panel
 

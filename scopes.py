@@ -5,7 +5,7 @@ try:
     from .funcy import *
     from .viewtools import (
         list_cursors, set_selection, map_selection,
-        source,
+        source, parsed_scope,
         region_f, region_b,
         order_regions,
     )
@@ -13,7 +13,7 @@ except ValueError: # HACK: for ST2 compatability
     from funcy import *
     from viewtools import (
         list_cursors, set_selection, map_selection,
-        source,
+        source, parsed_scope,
         region_f, region_b,
         order_regions,
     )
@@ -87,16 +87,19 @@ def func_at(view, pos):
 def find_matching_bracket(view, bracket):
     count = 1
     while count > 0 and bracket.a != -1:
-        # TODO: skip brackets in comments and strings
         bracket = view.find(r'[{}]', bracket.b)
-        if view.substr(bracket) == '{':
-            count += 1
-        else:
-            count -= 1
+        if not is_escaped(view, bracket.a):
+            if view.substr(bracket) == '{':
+                count += 1
+            else:
+                count -= 1
     return bracket
 
 def _func_defs(view):
     return view.find_by_selector('meta.function')
+
+def is_escaped(view, pos):
+    return any(s[0] in ('comment', 'string') for s in parsed_scope(view, pos))
 
 
 if ST3:
