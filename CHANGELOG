@@ -1,3 +1,6 @@
+- added PHP support for extract_expr (Bailey Parker)
+- added plugin commands to panel
+
 1.0.3
 - better install message
 
