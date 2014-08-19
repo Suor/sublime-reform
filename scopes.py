@@ -1,6 +1,8 @@
 import sublime, sublime_plugin
 ST3 = sublime.version() >= '3000'
 
+from functools import partial
+
 try:
     from .funcy import *
     from .viewtools import (
@@ -29,9 +31,7 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
 class SmartUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # TODO: jump by selectors in css/less/...
-        funcs = find_functions(self.view)
-        classes = find_classes(self.view)
-        regions = order_regions(funcs + classes)
+        regions = list_defs(self.view)
 
         def smart_up(pos):
             target = region_b(regions, pos.begin() - 1) or last(regions)
@@ -42,9 +42,7 @@ class SmartUpCommand(sublime_plugin.TextCommand):
 
 class SmartDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        funcs = find_functions(self.view)
-        classes = find_classes(self.view)
-        regions = order_regions(funcs + classes)
+        regions = list_defs(self.view)
 
         def smart_down(region):
             target = region_f(regions, region.end()) or first(regions)
@@ -53,42 +51,80 @@ class SmartDownCommand(sublime_plugin.TextCommand):
         map_selection(self.view, smart_down)
 
 
-class SelectFuncCommand(sublime_plugin.TextCommand):
+class SelectScopeUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        blocks = [func_at(self.view, p) for p in list_cursors(self.view)]
-        set_selection(self.view, blocks)
+        map_selection(self.view, partial(expand_scope, self.view))
+
+class SelectFuncCommand(SelectScopeUpCommand):
+    pass
 
 
-def find_functions(view):
+def list_func_defs(view):
     funcs = view.find_by_selector('meta.function')
     if source(view) == 'python':
         is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
 
-def find_classes(view):
+def list_class_defs(view):
     classes = view.find_by_selector('meta.class')
     instances = view.find_by_selector('meta.class.instance')
     return lwithout(classes, *instances)
 
+def list_defs(view):
+    funcs = list_func_defs(view)
+    classes = list_class_defs(view)
+    return order_regions(funcs + classes)
 
-def func_at(view, pos):
-    defs = _func_defs(view)
-    if source(view, pos) == 'python':
-        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
-        defs = lremove(is_junk, defs)
-    func_def = region_b(defs, pos)
 
-    lang = source(view, pos)
-    if lang == 'python':
-        next_line = newline_f(view, func_def.end())
-        return func_def.cover(view.indented_region(next_line))
-    elif lang == 'js':
-        start_bracket = view.find(r'{', func_def.end(), sublime.LITERAL)
-        end_bracket = find_matching_bracket(view, start_bracket)
-        return func_def.cover(end_bracket)
+def expand_scope(view, region):
+    scopes = list(scopes_up(view, region.end()))
+    if not scopes:
+        return region
+    expansion = first(s for s in scopes if s != region and s.contains(region))
+    if expansion:
+        return expansion
+    if region.empty():
+        return last(scopes)
     else:
-        return func_def
+        return region
+
+def scope_at(view, pos):
+    scopes = list(scopes_up(view, pos))
+    return first(s for s in scopes if s.contains(pos)) or first(scopes)
+
+def scopes_up(view, pos):
+    for scope, upper in with_next(_scopes_up(view, pos)):
+        yield scope
+        if upper and not upper.contains(scope):
+            break
+
+def _scopes_up(view, pos):
+    defs = list_defs(view)
+    adef = region_b(defs, pos)
+
+    while adef:
+        scope = _expand_def(view, adef)
+        yield scope
+        adef = region_b(defs, adef.begin() - 1)
+
+def _expand_def(view, adef):
+    lang = source(view, adef.begin())
+
+    if lang == 'python':
+        next_line = newline_f(view, adef.end())
+        return adef.cover(view.indented_region(next_line))
+    elif lang == 'js':
+        start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
+        end_bracket = find_matching_bracket(view, start_bracket)
+        return adef.cover(end_bracket)
+    else:
+        # Heuristics based on indentation for all other languages
+        next_line = newline_f(view, adef.end())
+        indented = view.indented_region(next_line)
+        last_line = view.line(indented.end())
+        return adef.cover(last_line)
+
 
 def find_matching_bracket(view, bracket):
     count = 1
@@ -100,9 +136,6 @@ def find_matching_bracket(view, bracket):
             else:
                 count -= 1
     return bracket
-
-def _func_defs(view):
-    return view.find_by_selector('meta.function')
 
 def is_escaped(view, pos):
     return any(s[0] in ('comment', 'string') for s in parsed_scope(view, pos))

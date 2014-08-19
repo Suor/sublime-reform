@@ -12,5 +12,7 @@
     { "keys": ["ctrl+alt+d"], "command": "delete_block" },
     { "keys": ["alt+enter"], "command": "extract_expr", "context": [
         { "key": "setting.is_widget", "operator": "equal", "operand": false}
-    ]}
+    ]},
+
+    { "keys": ["ctrl+shift+;"], "command": "select_scope_up" }
 ]

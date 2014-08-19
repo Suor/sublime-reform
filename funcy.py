@@ -1,5 +1,10 @@
 import re
 from operator import methodcaller
+from itertools import tee, chain
+try:
+    from itertools import izip as zip
+except ImportError:
+    pass
 
 
 ### funcy seqs
@@ -33,6 +38,15 @@ def without(seq, *items):
 def lwithout(seq, *items):
     return list(without(seq, *items))
 
+def pairwise(seq):
+    a, b = tee(seq)
+    next(b, None)
+    return zip(a, b)
+
+def with_next(seq, fill=None):
+    a, b = tee(seq)
+    next(b, None)
+    return zip(a, chain(b, [fill]))
 
 ### funcy strings
 
