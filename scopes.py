@@ -8,6 +8,7 @@ try:
     from .viewtools import (
         list_cursors, set_selection, map_selection,
         source, parsed_scope,
+        list_blocks,
         region_f, region_b,
         order_regions,
     )
@@ -16,6 +17,7 @@ except ValueError: # HACK: for ST2 compatability
     from viewtools import (
         list_cursors, set_selection, map_selection,
         source, parsed_scope,
+        list_blocks,
         region_f, region_b,
         order_regions,
     )
@@ -72,9 +74,14 @@ def list_class_defs(view):
     return lwithout(classes, *instances)
 
 def list_defs(view):
-    funcs = list_func_defs(view)
-    classes = list_class_defs(view)
-    return order_regions(funcs + classes)
+    if view.scope_name(0).startswith('text.'):
+        # plain text/markdown/rst
+        return list_blocks(view)
+    else:
+        # programming languages
+        funcs = list_func_defs(view)
+        classes = list_class_defs(view)
+        return order_regions(funcs + classes)
 
 
 def expand_scope(view, region):
