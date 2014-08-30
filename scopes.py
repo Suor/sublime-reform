@@ -63,15 +63,17 @@ class SelectFuncCommand(SelectScopeUpCommand):
 
 def list_func_defs(view):
     funcs = view.find_by_selector('meta.function')
-    if source(view) == 'python':
+    lang = source(view)
+    if lang == 'python':
         is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
+        funcs = lremove(is_junk, funcs)
+    elif lang == 'js':
+        is_junk = lambda r: re_test('^[\w\.]*prototype\.constructor', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
 
 def list_class_defs(view):
-    classes = view.find_by_selector('meta.class')
-    instances = view.find_by_selector('meta.class.instance')
-    return lwithout(classes, *instances)
+    return view.find_by_selector('meta.class')
 
 def list_defs(view):
     if view.scope_name(0).startswith('text.'):
@@ -80,6 +82,8 @@ def list_defs(view):
     else:
         # programming languages
         funcs = list_func_defs(view)
+        if source(view) == 'js':
+            return funcs
         classes = list_class_defs(view)
         return order_regions(funcs + classes)
 
