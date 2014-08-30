@@ -96,7 +96,7 @@ def expand_scope(view, region):
     if expansion:
         return expansion
     if region.empty():
-        return last(scopes)
+        return first(scopes)
     else:
         return region
 
@@ -108,7 +108,7 @@ def scopes_up(view, pos):
     for scope, upper in with_next(_scopes_up(view, pos)):
         yield scope
         if upper and not upper.contains(scope):
-            break
+            continue
 
 def _scopes_up(view, pos):
     defs = list_defs(view)
