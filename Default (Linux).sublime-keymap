@@ -14,5 +14,6 @@
         { "key": "setting.is_widget", "operator": "equal", "operand": false}
     ]},
 
-    { "keys": ["ctrl+shift+;"], "command": "select_scope_up" }
+    { "keys": ["ctrl+shift+;"], "command": "select_scope_up" },
+    { "keys": ["ctrl+shift+'"], "command": "select_scope_down" }
 ]

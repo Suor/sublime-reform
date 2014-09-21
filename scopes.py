@@ -43,10 +43,31 @@ class SmartDownCommand(sublime_plugin.TextCommand):
 
 class SelectScopeUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        if not hasattr(self.view, '_selection_stack'):
+            self.view._selection_stack = []
+
+        # Start stack afresh if nothing is selected
+        sel = list(self.view.sel())
+        if all(r.empty() for r in sel):
+            self.view._selection_stack = []
+
+        # Save current selection
+        self.view._selection_stack.append(sel)
+
         map_selection(self.view, partial(scope_up, self.view))
+
+        # If nothing changed remove dup from stack
+        if self.view._selection_stack[-1] == self.view.sel():
+            self.view._selection_stack.pop()
 
 class SelectFuncCommand(SelectScopeUpCommand):
     pass
+
+class SelectScopeDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        if getattr(self.view, '_selection_stack'):
+            set_selection(self.view, self.view._selection_stack.pop())
+            self.view.show(self.view.sel())
 
 
 def list_func_defs(view):
