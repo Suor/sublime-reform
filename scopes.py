@@ -5,22 +5,10 @@ from functools import partial
 
 try:
     from .funcy import *
-    from .viewtools import (
-        list_cursors, set_selection, map_selection,
-        source, parsed_scope,
-        list_blocks,
-        region_f, region_b,
-        order_regions,
-    )
+    from .viewtools import *
 except ValueError: # HACK: for ST2 compatability
     from funcy import *
-    from viewtools import (
-        list_cursors, set_selection, map_selection,
-        source, parsed_scope,
-        list_blocks,
-        region_f, region_b,
-        order_regions,
-    )
+    from viewtools import *
 
 
 class ScopesTestCommand(sublime_plugin.TextCommand):
@@ -55,20 +43,24 @@ class SmartDownCommand(sublime_plugin.TextCommand):
 
 class SelectScopeUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        map_selection(self.view, partial(expand_scope, self.view))
+        map_selection(self.view, partial(scope_up, self.view))
 
 class SelectFuncCommand(SelectScopeUpCommand):
     pass
 
 
 def list_func_defs(view):
-    funcs = view.find_by_selector('meta.function')
     lang = source(view)
+    # Sublime doesn't think "function() {}" (mind no space) is a func definition.
+    # It however thinks constructor and prototype have something to do with it.
+    if lang == 'js':
+        funcs = view.find_all(r'function')
+        is_junk = lambda r: is_escaped(view, r.a)
+        return lremove(is_junk, funcs)
+
+    funcs = view.find_by_selector('meta.function')
     if lang == 'python':
         is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
-        funcs = lremove(is_junk, funcs)
-    elif lang == 'js':
-        is_junk = lambda r: re_test('^[\w\.]*prototype\.constructor', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
 
@@ -88,7 +80,7 @@ def list_defs(view):
         return order_regions(funcs + classes)
 
 
-def expand_scope(view, region):
+def scope_up(view, region):
     scopes = list(scopes_up(view, region.end()))
     if not scopes:
         return region
@@ -126,6 +118,14 @@ def _expand_def(view, adef):
         next_line = newline_f(view, adef.end())
         return adef.cover(view.indented_region(next_line))
     elif lang == 'js':
+        # Functions in javascript are often declared in expression manner,
+        # we add function binding to prototype or object property as part of declaration.
+        ls = view.substr(line_start(view, adef.begin()))
+        prefix = re_find(r'\s*(?:\w+\s*:|[\w.]+\s*=)\s*$', ls)
+        if prefix:
+            adef.a -= len(prefix)
+
+        # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_matching_bracket(view, start_bracket)
         return adef.cover(end_bracket)
