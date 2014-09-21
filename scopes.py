@@ -75,7 +75,9 @@ def list_func_defs(view):
     # Sublime doesn't think "function() {}" (mind no space) is a func definition.
     # It however thinks constructor and prototype have something to do with it.
     if lang == 'js':
-        funcs = view.find_all(r'function')
+        # Functions in javascript are often declared in expression manner,
+        # we add function binding to prototype or object property as part of declaration.
+        funcs = view.find_all(r'[\t ]*(?:\w+ *:|(?:var +)?[\w.]+ *=) *function')
         is_junk = lambda r: is_escaped(view, r.a)
         return lremove(is_junk, funcs)
 
@@ -139,17 +141,17 @@ def _expand_def(view, adef):
         next_line = newline_f(view, adef.end())
         return adef.cover(view.indented_region(next_line))
     elif lang == 'js':
-        # Functions in javascript are often declared in expression manner,
-        # we add function binding to prototype or object property as part of declaration.
-        ls = view.substr(line_start(view, adef.begin()))
-        prefix = re_find(r'\s*(?:\w+\s*:|[\w.]+\s*=)\s*$', ls)
-        if prefix:
-            adef.a -= len(prefix)
-
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_matching_bracket(view, start_bracket)
-        return adef.cover(end_bracket)
+        adef = adef.cover(end_bracket)
+
+        # Match , or ; in case it's an expression
+        punct = view.find(r'\s*[,;]', adef.end())
+        if punct and punct.a == adef.b:
+            adef = adef.cover(punct)
+
+        return adef
     else:
         # Heuristics based on indentation for all other languages
         next_line = newline_f(view, adef.end())
