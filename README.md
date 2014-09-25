@@ -18,6 +18,7 @@ move_block_up     | ctrl+alt+;   | Swap block with a previous one
 move_block_down   | ctrl+alt+'   | Swap block with a next one
 delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate empty lines
 select_scope_up   | ctrl+shift+; | Select function/class at cursor, select enclosing one on next hit<sup>2</sup>
+select_scope_down | ctrl+shift+' | Undo last select_scope_up
 extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>3</sup>
 
 
@@ -40,7 +41,6 @@ extract_expr      | alt+enter    | Extract selected expression into an assignmen
 I have plans. Here is a list if you want to help and looking where to start:
 
 - Move functions up and down.
-- Select scopes, functions and classes.
 - Like Ctrl+D/Alt-F3 but respect word boundaries, case, scopes.
 - Select all words withing scope, all references to same name.
 - Break long lines.
