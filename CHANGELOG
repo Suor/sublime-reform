@@ -1,8 +1,11 @@
+1.1.0
 - added select_scope_up command
+- added select_scope_down command
+- better function detection in JavaScript
 - support non balanced {} in comments and strings
 - added PHP support for extract_expr (Bailey Parker)
 - added plugin commands to panel
-- skip "new" in smart up/down in js
+- smart_up/down for text/markdown/rst will jump by paragraphs
 
 1.0.3
 - better install message
