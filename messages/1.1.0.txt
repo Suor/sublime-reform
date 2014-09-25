@@ -1,7 +1,7 @@
 Hey, you just got some Reform improvements:
 
 - select_func command is replaced with select_scope_up,
-  which selects enclosing functions and class on subsequent hits.
+  which selects enclosing functions and classes on subsequent hits.
 - new select_scope_down command to undo last select_scope_up.
 - much better support for JavaScript functions for smart move and select commands.
 - PHP support to extract_expr command, thanks to Bailey Parker.
