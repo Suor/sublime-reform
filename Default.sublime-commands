@@ -42,8 +42,12 @@
     },
 
     {
-        "caption": "Select Func",
-        "command": "select_func"
+        "caption": "Select Scope Up",
+        "command": "select_scope_up"
+    },
+    {
+        "caption": "Select Scope Down",
+        "command": "select_scope_down"
     },
     {
         "caption": "Extract Expression",
