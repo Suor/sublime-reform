@@ -77,7 +77,7 @@ def list_func_defs(view):
     if lang == 'js':
         # Functions in javascript are often declared in expression manner,
         # we add function binding to prototype or object property as part of declaration.
-        funcs = view.find_all(r'[\t ]*(?:\w+ *:|(?:var +)?[\w.]+ *=) *function')
+        funcs = view.find_all(r'([\t ]*(?:\w+ *:|(?:var +)?[\w.]+ *=) *)?function')
         is_junk = lambda r: is_escaped(view, r.a)
         return lremove(is_junk, funcs)
 
