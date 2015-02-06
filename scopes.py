@@ -54,7 +54,7 @@ class SelectScopeUpCommand(sublime_plugin.TextCommand):
         # Save current selection
         self.view._selection_stack.append(sel)
 
-        map_selection(self.view, partial(scope_up, self.view))
+        map_selection(self.view, partial(smart_block_at, self.view))
 
         # If nothing changed remove dup from stack
         if self.view._selection_stack[-1] == self.view.sel():
@@ -68,6 +68,46 @@ class SelectScopeDownCommand(sublime_plugin.TextCommand):
         if getattr(self.view, '_selection_stack'):
             set_selection(self.view, self.view._selection_stack.pop())
             self.view.show(self.view.sel())
+
+
+def smart_block_at(view, region):
+    comments_block = comments_block_at(view, region.b)
+    block = block_at(view, region.b)
+    scope = scope_up(view, region)
+
+    if comments_block and not region.contains(comments_block):
+        return comments_block
+    elif block and not region.contains(block) and scope.a < block.a:
+        return block
+    else:
+        return scope
+
+def comments_block_at(view, pos):
+    def grab_empty_line_start(region):
+        line_start = view.line(region).a
+        space = view.find(r'[ \t]+', line_start)
+        if space and space.b == region.a:
+            return region.cover(space)
+        else:
+            return region
+
+    clines = list(map(grab_empty_line_start, view.find_by_selector('comment')))
+
+    pos = cursor_pos(view)
+    this_line = first((i, r) for i, r in enumerate(clines) if r.contains(pos))
+    if this_line:
+        i, block = this_line
+        for r in clines[i+1:]:
+            if r.a == block.b:
+                block = block.cover(r)
+            else:
+                break
+        for r in reversed(clines[:i]):
+            if r.b == block.a:
+                block = block.cover(r)
+            else:
+                break
+        return block
 
 
 def list_func_defs(view):
@@ -173,6 +213,9 @@ def find_matching_bracket(view, bracket):
 
 def is_escaped(view, pos):
     return any(s[0] in ('comment', 'string') for s in parsed_scope(view, pos))
+
+def is_comment(view, pos):
+    return any(s[0] == 'comment' for s in parsed_scope(view, pos))
 
 
 if ST3:
