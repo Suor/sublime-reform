@@ -77,7 +77,7 @@ def smart_block_at(view, region):
 
     if comments_block and not region.contains(comments_block):
         return comments_block
-    elif block and not region.contains(block) and scope.a < block.a:
+    elif block and not region.contains(block) and (not scope or scope.a < block.a):
         return block
     else:
         return scope
