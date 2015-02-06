@@ -1,4 +1,4 @@
-This this enables you to move through and reform your code like magic.
+This enables you to move through and reform your code like magic.
 At least it aims to do it :)
 
 See full list of available commands and key bindings here:
