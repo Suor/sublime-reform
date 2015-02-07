@@ -21,7 +21,7 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
 class SmartUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # TODO: jump by selectors in css/less/...
-        regions = list_defs(self.view)
+        regions = list_defs(self.view) or list_blocks(self.view)
 
         def smart_up(pos):
             target = region_b(regions, pos.begin() - 1) or last(regions)
@@ -32,7 +32,7 @@ class SmartUpCommand(sublime_plugin.TextCommand):
 
 class SmartDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        regions = list_defs(self.view)
+        regions = list_defs(self.view) or list_blocks(self.view)
 
         def smart_down(region):
             target = region_f(regions, region.end()) or first(regions)
@@ -80,7 +80,7 @@ def smart_block_at(view, region):
     elif block and not region.contains(block) and (not scope or scope.a < block.a):
         return block
     else:
-        return scope
+        return scope or region
 
 def comments_block_at(view, pos):
     def grab_empty_line_start(region):
@@ -131,29 +131,20 @@ def list_class_defs(view):
     return view.find_by_selector('meta.class')
 
 def list_defs(view):
-    if view.scope_name(0).startswith('text.'):
-        # plain text/markdown/rst
-        return list_blocks(view)
-    else:
-        # programming languages
-        funcs = list_func_defs(view)
-        if source(view) == 'js':
-            return funcs
-        classes = list_class_defs(view)
-        return order_regions(funcs + classes)
+    funcs = list_func_defs(view)
+    if source(view) == 'js':
+        return funcs
+    classes = list_class_defs(view)
+    return order_regions(funcs + classes)
 
 
 def scope_up(view, region):
     scopes = list(scopes_up(view, region.end()))
-    if not scopes:
-        return region
     expansion = first(s for s in scopes if s != region and s.contains(region))
     if expansion:
         return expansion
     if region.empty():
         return first(scopes)
-    else:
-        return region
 
 def scope_at(view, pos):
     scopes = list(scopes_up(view, pos))
