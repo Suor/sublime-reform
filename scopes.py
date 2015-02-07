@@ -60,6 +60,7 @@ class SelectScopeUpCommand(sublime_plugin.TextCommand):
         if self.view._selection_stack[-1] == self.view.sel():
             self.view._selection_stack.pop()
 
+# NOTE: this is deprecated
 class SelectFuncCommand(SelectScopeUpCommand):
     pass
 
