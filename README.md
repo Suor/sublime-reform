@@ -15,16 +15,18 @@ move_word_right   | ctrl+alt+/   | Swap word at cursor with a next one
 move_word_left    | ctrl+alt+.   | Swap word at cursor with a previous one
 move_block_up     | ctrl+alt+;   | Swap block with a previous one
 move_block_down   | ctrl+alt+'   | Swap block with a next one
-delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate empty lines
-select_scope_up   | ctrl+shift+; | Select block/function/class at cursor, select enclosing one on next hit<sup>2</sup>
+expand_next_word  | alt+d        | Expand selection to next word matching selected<sup>1</sup>
+select_scope_up   | ctrl+shift+; | Select block<sup>2</sup>/function/class at cursor, select enclosing one on next hit<sup>3</sup>
 select_scope_down | ctrl+shift+' | Undo last select_scope_up
-extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>3</sup>
+delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate empty lines
+extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>4</sup>
 
 
 <sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
-<sup>1</sup> Block is a adjacent commented lines or a blob of text surrounded with empty lines. <br>
-<sup>2</sup> Works for python, js, plain text. Tries to work for other languages. <br>
-<sup>3</sup> Works for python, js, ruby, php (and any languages with no keyword to define var).<br>
+<sup>1</sup> Matches only whole words, case-sensitive, comments and strings are skipped. If nothing selected, then word at cursor is selected first.<br>
+<sup>2</sup> Block is a adjacent commented lines or a blob of text surrounded with empty lines. <br>
+<sup>3</sup> Works for python, js, plain text. Tries to work for other languages. <br>
+<sup>4</sup> Works for python, js, ruby, php (and any languages with no keyword to define var).<br>
 
 
 ## Installation

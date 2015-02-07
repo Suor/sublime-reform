@@ -41,6 +41,33 @@ class SmartDownCommand(sublime_plugin.TextCommand):
         map_selection(self.view, smart_down)
 
 
+class ExpandNextWordCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        region = self.view.sel()[-1]
+        if region.empty():
+            region = word_at(self.view, region.a)
+            if region:
+                self.view.sel().add(region)
+                return
+
+        word = self.view.substr(region)
+        words = self.view.find_all(r'\b%s\b' % word)
+
+        # filter out words in strings and comments
+        allow_escaped = any(is_escaped(self.view, r.begin()) for r in self.view.sel())
+        if not allow_escaped:
+            words = [w for w in words if not is_escaped(self.view, w.a)]
+
+        # filter out already selected words
+        begins = set(r.begin() for r in self.view.sel())
+        words = [w for w in words if w.begin() not in begins]
+
+        next_word = first(r for r in words if r.begin() > region.end()) or first(words)
+        if next_word:
+            self.view.sel().add(next_word)
+            self.view.show(next_word)
+
+
 class SelectScopeUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         if not hasattr(self.view, '_selection_stack'):
