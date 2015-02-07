@@ -50,13 +50,7 @@ class ExpandNextWordCommand(sublime_plugin.TextCommand):
                 self.view.sel().add(region)
                 return
 
-        word = self.view.substr(region)
-        words = self.view.find_all(r'\b%s\b' % word)
-
-        # filter out words in strings and comments
-        allow_escaped = any(is_escaped(self.view, r.begin()) for r in self.view.sel())
-        if not allow_escaped:
-            words = [w for w in words if not is_escaped(self.view, w.a)]
+        words = get_words(self.view, region)
 
         # filter out already selected words
         begins = set(r.begin() for r in self.view.sel())
@@ -66,6 +60,33 @@ class ExpandNextWordCommand(sublime_plugin.TextCommand):
         if next_word:
             self.view.sel().add(next_word)
             self.view.show(next_word)
+
+class SelectScopeWordsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        region = self.view.sel()[-1]
+        if region.empty():
+            region = word_at(self.view, region.a)
+            if not region:
+                return
+
+        words = get_words(self.view, region)
+
+        # filter by scope
+        scope = scope_at(self.view, region.end())
+        words = [w for w in words if scope.contains(w)]
+
+        set_selection(self.view, words)
+
+def get_words(view, region):
+    word = view.substr(region)
+    words = view.find_all(r'\b%s\b' % word)
+
+    # filter out words in strings and comments
+    allow_escaped = any(is_escaped(view, r.begin()) for r in view.sel())
+    if not allow_escaped:
+        words = [w for w in words if not is_escaped(view, w.a)]
+
+    return words
 
 
 class SelectScopeUpCommand(sublime_plugin.TextCommand):

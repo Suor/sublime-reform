@@ -15,15 +15,16 @@ move_word_right   | ctrl+alt+/   | Swap word at cursor with a next one
 move_word_left    | ctrl+alt+.   | Swap word at cursor with a previous one
 move_block_up     | ctrl+alt+;   | Swap block with a previous one
 move_block_down   | ctrl+alt+'   | Swap block with a next one
-expand_next_word  | alt+d        | Expand selection to next word matching selected<sup>1</sup>
+expand_next_word  | alt+d        | Expand selection to next word matching one at cursor<sup>1</sup>
+select_scope_words| ctrl+shift+, | Select words in function scope matching word at cursor<sup>1,3</sup>
 select_scope_up   | ctrl+shift+; | Select block<sup>2</sup>/function/class at cursor, select enclosing one on next hit<sup>3</sup>
 select_scope_down | ctrl+shift+' | Undo last select_scope_up
-delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate empty lines
+delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate adjusting empty lines
 extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>4</sup>
 
 
 <sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
-<sup>1</sup> Matches only whole words, case-sensitive, comments and strings are skipped. If nothing selected, then word at cursor is selected first.<br>
+<sup>1</sup> Matches only whole words, case-sensitive, comments and strings are skipped. <br>
 <sup>2</sup> Block is a adjacent commented lines or a blob of text surrounded with empty lines. <br>
 <sup>3</sup> Works for python, js, plain text. Tries to work for other languages. <br>
 <sup>4</sup> Works for python, js, ruby, php (and any languages with no keyword to define var).<br>
@@ -42,8 +43,7 @@ extract_expr      | alt+enter    | Extract selected expression into an assignmen
 I have plans. Here is a list if you want to help and looking where to start:
 
 - Move functions up and down.
-- Like Ctrl+D/Alt-F3 but respect word boundaries, case, scopes.
-- Select all words withing scope, all references to same name.
+- Better select words in scope: expand to next scope on subsequent hit, autodetect name scope.
 - Break long lines.
 - Break long strings, several variants including switching to multiline separators.
 - Reform dicts (object literals) from one-line to multi-line and back.
