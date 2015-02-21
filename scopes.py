@@ -80,7 +80,7 @@ class SelectScopeWordsCommand(sublime_plugin.TextCommand):
         words = get_words(self.view, region)
 
         # filter by scope
-        scope = scope_at(self.view, region.end())
+        scope = scope_at(self.view, region.end()) or block_at(self.view, region.end())
         words = [w for w in words if scope.contains(w)]
 
         set_selection(self.view, words)
