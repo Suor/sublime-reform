@@ -9,10 +9,10 @@ Command           | Key binding<sup>*</sup> | Description
 ----------------- | ------------ | ---------------------------------------------------------------
 find_word_up      | ctrl+up      | Jump to previous occurrence of a word at cursor
 find_word_down    | ctrl+down    | Jump to next occurrence of a word at cursor
-smart_down        | alt+down     | Jump to next declaration or block<sup>2</sup>
-smart_up          | alt+up       | Jump to previous declaration or block<sup>2</sup>
-def_down          | alt+pagedown | Jump to next function or class declaration
-def_up            | alt+pageup   | Jump to previous function or class declaration
+def_up            | alt+up       | Jump to previous function or class declaration
+def_down          | alt+down     | Jump to next function or class declaration
+smart_up          | alt+[        | Jump to previous declaration or block<sup>2</sup>
+smart_down        | alt+]        | Jump to next declaration or block<sup>2</sup>
 move_word_right   | ctrl+alt+/   | Swap word at cursor with a next one
 move_word_left    | ctrl+alt+.   | Swap word at cursor with a previous one
 move_block_up     | ctrl+alt+;   | Swap block with a previous one

@@ -1,10 +1,10 @@
 [
     { "keys": ["ctrl+up"], "command": "find_word_up" },
     { "keys": ["ctrl+down"], "command": "find_word_down" },
-    { "keys": ["alt+up"], "command": "smart_up" },
-    { "keys": ["alt+down"], "command": "smart_down" },
-    { "keys": ["alt+pageup"], "command": "def_up" },
-    { "keys": ["alt+pagedown"], "command": "def_down" },
+    { "keys": ["alt+up"], "command": "def_up" },
+    { "keys": ["alt+down"], "command": "def_down" },
+    { "keys": ["alt+["], "command": "smart_up" },
+    { "keys": ["alt+]"], "command": "smart_down" },
 
     { "keys": ["ctrl+alt+/"], "command": "move_word_right" },
     { "keys": ["ctrl+alt+."], "command": "move_word_left" },
