@@ -1,0 +1,24 @@
+New and improved things just got installed:
+
+- new expand_next_word command is basically an improved version of Ctrl+D/Cmd+D.
+  Next word matching the one at cursor will be added to selection on each hotkey
+  (Alt+D) hit, this respects word boundaries, case, comments and strings.
+
+- select_scope_words (Alt+Shift+D) will select all words in current function
+  scope matching the one at cursor. Word boundaries, case, comments and strings
+  are respected.
+
+- select_scope_up will now select blocks of comments and line-separated blocks
+  and generally became smater. It's now useful for non-code sources too.
+  Remember - just hit Ctrl+Shift+; more to select enclosing scopes.
+
+- smart_up and smart_down commands now also visit blocks and were rebinded to
+  Alt+[ and Alt+]. Old hotkeys now refer to def_up and def_down commands and
+  behave the same.
+
+Reform also got better Python and C# support and other minor enhancements.
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform

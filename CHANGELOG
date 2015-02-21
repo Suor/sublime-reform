@@ -1,3 +1,14 @@
+1.2.0
+- add expand_next_word command
+- add select_scope_words command
+- made select_scope_up select comment blocks and line-separated one
+- made smart_* hit blocks
+- added def_* commands to jump by declarations
+- better C# support
+- fixed selecting decorators with function def in python
+- fixed scope up for non programming language sources
+- fixed selecting last function in ST2
+
 1.1.0
 - added select_scope_up command
 - added select_scope_down command
