@@ -161,6 +161,9 @@ def comments_block_at(view, pos):
 
 def list_func_defs(view):
     lang = source(view)
+    if lang == 'cs':
+        return view.find_by_selector('meta.method.identifier')
+
     # Sublime doesn't think "function() {}" (mind no space) is a func definition.
     # It however thinks constructor and prototype have something to do with it.
     if lang == 'js':
@@ -177,7 +180,11 @@ def list_func_defs(view):
     return funcs
 
 def list_class_defs(view):
-    return view.find_by_selector('meta.class')
+    lang = source(view)
+    if lang == 'cs':
+        return view.find_by_selector('meta.class.identifier')
+    else:
+        return view.find_by_selector('meta.class')
 
 def list_defs(view):
     funcs = list_func_defs(view)
@@ -220,16 +227,19 @@ def _expand_def(view, adef):
     if lang == 'python':
         next_line = newline_f(view, adef.end())
         return adef.cover(view.indented_region(next_line))
-    elif lang == 'js':
+    elif lang in ('js', 'cs'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_matching_bracket(view, start_bracket)
         adef = adef.cover(end_bracket)
 
         # Match , or ; in case it's an expression
-        punct = view.find(r'\s*[,;]', adef.end())
-        if punct and punct.a == adef.b:
-            adef = adef.cover(punct)
+        if lang == 'js':
+            punct = view.find(r'\s*[,;]', adef.end())
+            if punct and punct.a == adef.b:
+                adef = adef.cover(punct)
+        else:
+            adef = adef.cover(view.line(adef.begin()))
 
         return adef
     else:
