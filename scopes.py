@@ -234,7 +234,14 @@ def _expand_def(view, adef):
 
     if lang == 'python':
         next_line = newline_f(view, adef.end())
-        return adef.cover(view.indented_region(next_line))
+        adef = adef.cover(view.indented_region(next_line))
+        while True:
+            p = line_b_begin(view, adef.begin())
+            if p < adef.begin() and 'meta.function.decorator' in scope_name(view, p):
+                adef = adef.cover(sublime.Region(p, p))
+            else:
+                break
+        return adef
     elif lang in ('js', 'cs'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
@@ -277,9 +284,25 @@ def is_comment(view, pos):
 
 
 if ST3:
+    def line_b_begin(view, pos):
+        if view.classify(pos) & sublime.CLASS_LINE_START:
+            return newline_b(view, pos)
+        else:
+            return newline_b(view, newline_b(view, pos))
+
+    def newline_b(view, pos):
+        return view.find_by_class(pos, False, sublime.CLASS_LINE_START)
+
     def newline_f(view, pos):
         return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
 else:
+    def line_b_begin(view, pos):
+        line_start = view.line(pos).begin()
+        return newline_b(view, min(pos, line_start))
+
+    def newline_b(view, pos):
+        return view.line(pos - 1).begin()
+
     def newline_f(view, pos):
         region = view.find(r'^', pos + 1)
         return region.end()
