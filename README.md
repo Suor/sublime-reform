@@ -18,7 +18,7 @@ move_word_left    | ctrl+alt+.   | Swap word at cursor with a previous one
 move_block_up     | ctrl+alt+;   | Swap block with a previous one
 move_block_down   | ctrl+alt+'   | Swap block with a next one
 expand_next_word  | alt+d        | Expand selection to next word matching one at cursor<sup>1</sup>
-select_scope_words| ctrl+shift+, | Select words in function scope matching word at cursor<sup>1,3</sup>
+select_scope_words| alt+shift+d  | Select words in function scope matching word at cursor<sup>1,3</sup>
 select_scope_up   | ctrl+shift+; | Select block<sup>2</sup>/function/class at cursor, select enclosing one on next hit<sup>3</sup>
 select_scope_down | ctrl+shift+' | Undo last select_scope_up
 delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate adjusting empty lines

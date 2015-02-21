@@ -17,7 +17,7 @@
     ]},
 
     { "keys": ["alt+d"], "command": "expand_next_word" },
-    { "keys": ["ctrl+shift+,"], "command": "select_scope_words" },
+    { "keys": ["alt+shift+d"], "command": "select_scope_words" },
 
     { "keys": ["ctrl+shift+;"], "command": "select_scope_up" },
     { "keys": ["ctrl+shift+'"], "command": "select_scope_down" }
