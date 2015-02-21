@@ -281,5 +281,5 @@ if ST3:
         return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
 else:
     def newline_f(view, pos):
-        region = view.find(r'\n', pos + 1)
+        region = view.find(r'^', pos + 1)
         return region.end()
