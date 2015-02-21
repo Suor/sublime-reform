@@ -5,7 +5,7 @@ At least it aims to do it :)
 
 Here is a list of supported commands:
 
-Command           | Key binding<sup>*</sup> | Description
+Command           | Key<sup>*</sup> | Description
 ----------------- | ------------ | ---------------------------------------------------------------
 find_word_up      | ctrl+up      | Jump to previous occurrence of a word at cursor
 find_word_down    | ctrl+down    | Jump to next occurrence of a word at cursor
