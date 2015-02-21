@@ -20,25 +20,33 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
 
 class SmartUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        # TODO: jump by selectors in css/less/...
-        regions = list_defs(self.view) or list_blocks(self.view)
-
-        def smart_up(pos):
-            target = region_b(regions, pos.begin() - 1) or last(regions)
-            return target.begin()
-
-        map_selection(self.view, smart_up)
-
+        regions = order_regions(list_defs(self.view) + list_blocks(self.view))
+        map_selection(self.view, partial(smart_up, regions))
 
 class SmartDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        regions = order_regions(list_defs(self.view) + list_blocks(self.view))
+        map_selection(self.view, partial(smart_down, regions))
+
+class DefUpCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # TODO: jump by selectors in css/less/...
         regions = list_defs(self.view) or list_blocks(self.view)
+        map_selection(self.view, partial(smart_up, regions))
 
-        def smart_down(region):
-            target = region_f(regions, region.end()) or first(regions)
-            return target.begin()
+class DefDownCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        regions = list_defs(self.view) or list_blocks(self.view)
+        map_selection(self.view, partial(smart_down, regions))
 
-        map_selection(self.view, smart_down)
+def smart_up(regions, current):
+    target = region_b(regions, current.begin() - 1) or last(regions)
+    return target.begin()
+
+def smart_down(regions, current):
+    target = region_f(regions, current.end()) or first(regions)
+    return target.begin()
+
 
 
 class ExpandNextWordCommand(sublime_plugin.TextCommand):
