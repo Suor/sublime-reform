@@ -1,5 +1,7 @@
 # Reform
 
+[![Join the chat at https://gitter.im/Suor/sublime-reform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Suor/sublime-reform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This thing enables you to move through and reform your code like magic.
 At least it aims to do it :)
 
