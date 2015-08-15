@@ -32,6 +32,8 @@ except ValueError: # HACK: for ST2 compatability
 
 ### Word commands
 
+# TODO: alter word boundaries on context,
+#       e.g. if it's a css class then "-"" should be word symbol
 class FindWordDownCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         pos = cursor_pos(self.view)
