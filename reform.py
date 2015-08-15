@@ -81,13 +81,6 @@ class MoveWordLeftCommand(sublime_plugin.TextCommand):
 
 ### Block commands
 
-# NOTE: this is deprecated
-class SelectBlockCommand(sublime_plugin.TextCommand):
-     def run(self, edit):
-        blocks = [block_at(self.view, p) for p in list_cursors(self.view)]
-        set_selection(self.view, blocks)
-
-
 class MoveBlockUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         blocks = list_blocks(self.view)

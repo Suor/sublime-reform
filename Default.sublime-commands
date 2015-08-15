@@ -25,10 +25,6 @@
     },
 
     {
-        "caption": "Select Block",
-        "command": "select_block"
-    },
-    {
         "caption": "Move Block Up",
         "command": "move_block_up"
     },
