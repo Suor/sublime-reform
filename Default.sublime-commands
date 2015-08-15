@@ -1,52 +1,52 @@
 [
     {
-        "caption": "Find Word Up",
+        "caption": "Reform: Find Word Up",
         "command": "find_word_up"
     },
     {
-        "caption": "Find Word Down",
+        "caption": "Reform: Find Word Down",
         "command": "find_word_down"
     },
     {
-        "caption": "Smart Up",
+        "caption": "Reform: Smart Up",
         "command": "smart_up"
     },
     {
-        "caption": "Smart Down",
+        "caption": "Reform: Smart Down",
         "command": "smart_down"
     },
     {
-        "caption": "Move Word Right",
+        "caption": "Reform: Move Word Right",
         "command": "move_word_right"
     },
     {
-        "caption": "Move Word Left",
+        "caption": "Reform: Move Word Left",
         "command": "move_word_left"
     },
 
     {
-        "caption": "Move Block Up",
+        "caption": "Reform: Move Block Up",
         "command": "move_block_up"
     },
     {
-        "caption": "Move Block Down",
+        "caption": "Reform: Move Block Down",
         "command": "move_block_down"
     },
     {
-        "caption": "Delete Block",
+        "caption": "Reform: Delete Block",
         "command": "delete_block"
     },
 
     {
-        "caption": "Select Scope Up",
+        "caption": "Reform: Select Scope Up",
         "command": "select_scope_up"
     },
     {
-        "caption": "Select Scope Down",
+        "caption": "Reform: Select Scope Down",
         "command": "select_scope_down"
     },
     {
-        "caption": "Extract Expression",
+        "caption": "Reform: Extract Expression",
         "command": "extract_expr"
     }
 ]
