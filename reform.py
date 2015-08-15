@@ -127,11 +127,27 @@ class EncallCommand(sublime_plugin.TextCommand):
             m = match_around(r'[\w\.]+', line_str, s.b - line.begin())
             if m:
                 r = sublime.Region(m[0] + line.begin(), m[1] + line.begin())
+                if self.view.substr(r.end()) == '(':
+                    closing = find_matching_paren(self.view, sublime.Region(r.end(), r.end()+1))
+                    r = r.cover(closing)
                 s = self.view.substr(r)
                 self.view.replace(edit, r, '(%s)' % s)
                 new_sels.append(r.begin())
 
         set_selection(self.view, new_sels)
+
+from .scopes import is_escaped
+
+def find_matching_paren(view, paren):
+    count = 1
+    while count > 0 and paren.a != -1:
+        paren = view.find(r'[()]', paren.b)
+        if not is_escaped(view, paren.a):
+            if view.substr(paren) == '(':
+                count += 1
+            else:
+                count -= 1
+    return paren
 
 
 class ExtractExprCommand(sublime_plugin.TextCommand):
