@@ -151,7 +151,7 @@ def comments_block_at(view, pos):
     clines = list(map(grab_empty_line_start, view.find_by_selector('comment')))
 
     pos = cursor_pos(view)
-    this_line = first((i, r) for i, r in enumerate(clines) if r.contains(pos))
+    this_line = first((i, r) for i, r in enumerate(clines) if r.contains(pos) and r.b != pos)
     if this_line:
         i, block = this_line
         for r in clines[i+1:]:
