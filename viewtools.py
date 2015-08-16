@@ -223,7 +223,13 @@ def expand_min_gap(view, region):
     if not empty_neighbours:
         return region
     elif len(empty_neighbours) == 1:
-        return region.cover(empty_neighbours[0])
+        if is_view_bordering(view, region):
+            return region.cover(empty_neighbours[0])
+        else:
+            return region
     else:
         min_gap = min(empty_neighbours, key=lambda r: view.substr(r).count('\n'))
         return region.cover(min_gap)
+
+def is_view_bordering(view, region):
+    return region.begin() == 0 or region.end() == view.size()

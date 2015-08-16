@@ -109,13 +109,6 @@ class MoveBlockDownCommand(sublime_plugin.TextCommand):
         self.view.show(next_block)
 
 
-class DeleteBlockCommand(sublime_plugin.TextCommand):
-     def run(self, edit):
-        pos = cursor_pos(self.view)
-        this_block = block_at(self.view, pos)
-        self.view.erase(edit, expand_min_gap(self.view, this_block))
-
-
 ### Other commands
 
 class EncallCommand(sublime_plugin.TextCommand):
