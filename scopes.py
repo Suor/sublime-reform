@@ -82,6 +82,7 @@ class ExpandNextWordCommand(sublime_plugin.TextCommand):
 
 class SelectScopeWordsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        # TODO: make this not include decorators in python
         region = self.view.sel()[-1]
         if region.empty():
             region = word_at(self.view, region.a)
@@ -232,13 +233,12 @@ def scopes_up(view, pos):
             continue
 
 def _scopes_up(view, pos):
-    defs = list_defs(view)
-    adef = region_b(defs, pos)
+    scopes = [_expand_def(view, adef) for adef in list_defs(view)]
 
-    while adef:
-        scope = _expand_def(view, adef)
+    scope = region_b(scopes, pos)
+    while scope:
         yield scope
-        adef = region_b(defs, adef.begin() - 1)
+        scope = region_b(scopes, scope.begin() - 1)
 
 def _expand_def(view, adef):
     lang = source(view, adef.begin())
