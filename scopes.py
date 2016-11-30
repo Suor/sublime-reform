@@ -165,7 +165,7 @@ class SelectScopeDownCommand(sublime_plugin.TextCommand):
 
 def smart_block_at(view, region):
     comments_block = comments_block_at(view, region.b)
-    block = block_at(view, region.b)
+    block = block_at(view, region.b)  # TODO: smarter block, limit it by scope?
     scope = scope_up(view, region)
 
     if comments_block and not region.contains(comments_block):
