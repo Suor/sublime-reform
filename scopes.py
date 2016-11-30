@@ -11,11 +11,35 @@ except ValueError: # HACK: for ST2 compatability
     from viewtools import *
 
 
+class TestCommandCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        pass
+
+
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print("test")
-        # from .viewtools import word_f, cursor_pos
-        # set_selection(self.view, word_f(self.view, cursor_pos(self.view)))
+        # print(list_defs(self.view))
+
+        # scopes = [_expand_def(view, adef) for adef in list_defs(view)]
+        scopes = list_defs(self.view)
+        set_selection(self.view, scopes)
+        return
+
+        pos = cursor_pos(self.view)
+        scope = region_b(scopes, pos)
+        print(scope)
+        scope = _expand_def(self.view, scope)
+        set_selection(self.view, [scope])
+        # # from .viewtools import word_f, cursor_pos
+        # # set_selection(self.view, word_f(self.view, cursor_pos(self.view)))
+        # # print(self.view.find_by_selector('meta.function'))
+        # # block = scope_up(self.view, self.view.sel()[0])
+        # # set_selection(self.view, block)
+        # # set_selection(self.view, list_defs(self.view))
+        # # ls = self.view.find_by_class(pos, False, sublime.CLASS_LINE_START)
+        # ls = newline_f(self.view, pos)
+        # set_selection(self.view, ls)
 
 
 class SmartUpCommand(sublime_plugin.TextCommand):
@@ -181,7 +205,7 @@ def comments_block_at(view, pos):
 
 def list_func_defs(view):
     lang = source(view)
-    if lang == 'cs':
+    if lang in ('cs', 'java'):
         return view.find_by_selector('meta.method.identifier')
 
     # Sublime doesn't think "function() {}" (mind no space) is a func definition.
@@ -201,7 +225,7 @@ def list_func_defs(view):
 
 def list_class_defs(view):
     lang = source(view)
-    if lang == 'cs':
+    if lang in ('cs', 'java'):
         return view.find_by_selector('meta.class.identifier')
     else:
         return view.find_by_selector('meta.class')
@@ -253,7 +277,7 @@ def _expand_def(view, adef):
             else:
                 break
         return adef
-    elif lang in ('js', 'cs'):
+    elif lang in ('js', 'cs', 'java'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_matching_bracket(view, start_bracket)
