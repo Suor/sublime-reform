@@ -1,0 +1,12 @@
+New and improved things just got installed:
+
+- smarter smart selects with comments and python decorators
+- use delete_block now to easily delete commented block
+- encall now captures other calls
+
+Reform got better Java support and other minor enhancements.
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform

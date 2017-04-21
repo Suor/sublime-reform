@@ -1,3 +1,13 @@
+1.3
+- support Java better
+- delete_block will now delete commented block first
+- don't select part of a function when on cursor on decorator
+- don't select comment in prev line with scope_up
+- change encall command to capture other calls
+- prefix palette commands with "Reform: "
+- removed deprecated select_block command
+- fixed python function selection for last sublime
+
 1.2.0
 - add expand_next_word command
 - add select_scope_words command
