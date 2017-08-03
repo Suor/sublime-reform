@@ -272,7 +272,8 @@ def _expand_def(view, adef):
         adef = adef.cover(view.indented_region(next_line))
         while True:
             p = line_b_begin(view, adef.begin())
-            if p < adef.begin() and re_test('meta.\w+.decorator', scope_name(view, p)):
+            if p < adef.begin() and \
+                    re_test('meta.(annotation|\w+.decorator)', scope_name(view, p)):
                 adef = adef.cover(sublime.Region(p, p))
             else:
                 break
