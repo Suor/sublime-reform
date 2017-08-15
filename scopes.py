@@ -1,7 +1,8 @@
 import sublime, sublime_plugin
 ST3 = sublime.version() >= '3000'
 
-from functools import partial
+from functools import partial, reduce
+from itertools import takewhile
 
 try:
     from .funcy import *
@@ -165,7 +166,7 @@ class SelectScopeUpCommand(sublime_plugin.TextCommand):
         # Save current selection
         self.view._selection_stack.append(sel)
 
-        map_selection(self.view, partial(smart_block_at, self.view))
+        map_selection(self.view, partial(smart_region_up, self.view))
 
         # If nothing changed remove dup from stack
         if self.view._selection_stack[-1] == self.view.sel():
@@ -182,9 +183,9 @@ class SelectScopeDownCommand(sublime_plugin.TextCommand):
             self.view.show(self.view.sel())
 
 
-def smart_block_at(view, region):
+def smart_region_up(view, region):
     comments_block = comments_block_at(view, region.b)
-    block = block_at(view, region.b)  # TODO: smarter block, limit it by scope?
+    block = smart_block_at(view, region.begin())
     scope = scope_up(view, region)
 
     if comments_block and not region.contains(comments_block):
@@ -220,6 +221,35 @@ def comments_block_at(view, pos):
             else:
                 break
         return block
+
+
+def smart_block_at(view, pos):
+    lang = source(view)
+    return block_at(view, pos)
+    if lang == 'python':
+        return block_at(view, pos)
+    else:
+        # TODO: curly block
+        block = block_at(view, pos)
+        indented = indented_block_at(view, pos)
+        return indented
+        # if block.contains(indented):
+        #     return indented.intersection(block)
+
+
+def indented_block_at(view, pos):
+    line_str = view.substr(view.line(pos))
+    prefix = re_find(r'^[ \t]+', line_str)
+
+    def fits(line):
+        s = view.substr(line)
+        return s.isspace() or s.startswith(prefix)
+
+    return cover_regions(chain(takewhile(fits, list_lines_b(view, pos)),
+                               takewhile(fits, list_lines_f(view, pos))))
+
+def cover_regions(regions):
+    return reduce(lambda a, b: a.cover(b), regions)
 
 
 def list_func_defs(view):
