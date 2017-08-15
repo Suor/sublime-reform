@@ -133,6 +133,25 @@ def get_words(view, region):
     return words
 
 
+class InlineExprCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        sel = self.view.sel()[0]
+        pos = sel.begin()
+        line = self.view.liselene(pos)
+        line_str = self.view.substr(line)
+
+        try:
+            var, expr = re_find(r'^\s*(\w+)\s*=\s*(.*)$', line_str)
+        except TypeError:
+            return
+        scope = scope_at(self.view, pos)
+        var_regions = self.view.find_all(r'\b%s\b' % var)
+        var_regions = [r for r in var_regions if scope.contains(r)]
+        for r in reversed(var_regions):
+            self.view.replace(edit, r, expr)
+        self.view.erase(edit, self.view.full_line(pos))
+
+
 class SelectScopeUpCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         if not hasattr(self.view, '_selection_stack'):
