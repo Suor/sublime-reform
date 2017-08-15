@@ -138,7 +138,7 @@ class InlineExprCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         sel = self.view.sel()[0]
         pos = sel.begin()
-        line = self.view.liselene(pos)
+        line = self.view.line(pos)
         line_str = self.view.substr(line)
 
         try:
