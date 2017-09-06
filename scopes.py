@@ -145,7 +145,7 @@ class InlineExprCommand(sublime_plugin.TextCommand):
             var, expr = re_find(r'^\s*(\w+)\s*=\s*(.*)$', line_str)
         except TypeError:
             return
-        scope = scope_at(self.view, pos)
+        scope = scope_at(self.view, pos) or sublime.Region(0, self.view.size())
         var_regions = self.view.find_all(r'\b%s\b' % var)
         var_regions = [r for r in var_regions if scope.contains(r)]
         for r in reversed(var_regions):
