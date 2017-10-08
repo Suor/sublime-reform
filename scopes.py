@@ -313,16 +313,21 @@ def _scopes_up(view, pos):
         yield scope
         scope = region_b(scopes, scope.begin() - 1)
 
+
 def _expand_def(view, adef):
     lang = source(view, adef.begin())
 
     if lang == 'python':
         next_line = newline_f(view, adef.end())
         adef = adef.cover(view.indented_region(next_line))
+        prefix = re_find(r'^[ \t]*', view.substr(view.line(adef.begin())))
         while True:
             p = line_b_begin(view, adef.begin())
-            if p < adef.begin() and \
-                    re_test('meta.(annotation|\w+.decorator)', scope_name(view, p)):
+            if p is None:
+                break
+            line_b_str = view.substr(view.line(p))
+            if line_b_str.startswith(prefix) and re_test('meta.(annotation|\w+.decorator)',
+                    scope_name(view, p + len(prefix))):
                 adef = adef.cover(sublime.Region(p, p))
             else:
                 break
@@ -376,18 +381,22 @@ if ST3:
             return newline_b(view, newline_b(view, pos))
 
     def newline_b(view, pos):
-        return view.find_by_class(pos, False, sublime.CLASS_LINE_START)
+        if pos > 0:
+            return view.find_by_class(pos, False, sublime.CLASS_LINE_START)
 
     def newline_f(view, pos):
-        return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+        if pos < view.size():
+            return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
 else:
     def line_b_begin(view, pos):
         line_start = view.line(pos).begin()
         return newline_b(view, min(pos, line_start))
 
     def newline_b(view, pos):
-        return view.line(pos - 1).begin()
+        if pos > 0:
+            return view.line(pos - 1).begin()
 
     def newline_f(view, pos):
-        region = view.find(r'^', pos + 1)
-        return region.end()
+        if pos < view.size():
+            region = view.find(r'^', pos + 1)
+            return region.end()
