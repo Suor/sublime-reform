@@ -349,7 +349,7 @@ def _expand_def(view, adef):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_matching_bracket(view, start_bracket)
-        adef = adef.cover(end_bracket)
+        adef = adef.cover(view.full_line(end_bracket))
 
         # Match , or ; in case it's an expression
         if lang == 'js':
