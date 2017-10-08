@@ -296,7 +296,7 @@ def scope_up(view, region):
         return first(scopes)
 
 def scope_at(view, pos):
-    scopes = list(scopes_up(view, pos))
+    scopes = scopes_up(view, pos)
     return first(s for s in scopes if s.contains(pos))
 
 def scopes_up(view, pos):
