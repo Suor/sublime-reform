@@ -238,33 +238,6 @@ def smart_block_at(view, pos):
     return block
 
 
-def count_curlies(view, region):
-    curlies = count_reps(map(view.substr, find_iter(view, r'[{}]', region)))
-    return curlies['{'] - curlies['}']
-
-def find_closing_curly(view, pos, count=1):
-    for curly in find_iter(view, r'[{}]', pos):
-        count += 1 if view.substr(curly) == '{' else -1
-        if count == 0:
-            return curly
-
-def find_iter(view, pattern, pos_or_region):
-    region = pos_or_region if isinstance(pos_or_region, sublime.Region) else \
-             sublime.Region(pos_or_region, view.size())
-    start, end = region.begin(), region.end()
-    found = sublime.Region(start, start)
-    while found.a != -1:
-        found = view.find(pattern, found.b)
-        if found.b > end:
-            break
-        if not is_escaped(view, found.a):
-            yield found
-
-
-def cover_regions(regions):
-    return reduce(lambda a, b: a.cover(b), regions)
-
-
 def list_func_defs(view):
     lang = source(view)
     if lang in ('cs', 'java'):
@@ -339,7 +312,7 @@ def _expand_def(view, adef):
             if p is None:
                 break
             line_b_str = view.substr(view.line(p))
-            if line_b_str.startswith(prefix) and re_test('meta.(annotation|\w+.decorator)',
+            if line_b_str.startswith(prefix) and re_test(r'meta.(annotation|\w+.decorator)',
                     scope_name(view, p + len(prefix))):
                 adef = adef.cover(sublime.Region(p, p))
             else:
@@ -348,7 +321,7 @@ def _expand_def(view, adef):
     elif lang in ('js', 'cs', 'java'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
-        end_bracket = find_matching_bracket(view, start_bracket)
+        end_bracket = find_closing_curly(view, start_bracket.b)
         adef = adef.cover(view.full_line(end_bracket))
 
         # Match , or ; in case it's an expression
@@ -366,50 +339,3 @@ def _expand_def(view, adef):
         indented = view.indented_region(next_line)
         last_line = view.line(indented.end())
         return adef.cover(last_line)
-
-
-def find_matching_bracket(view, bracket):
-    count = 1
-    while count > 0 and bracket.a != -1:
-        bracket = view.find(r'[{}]', bracket.b)
-        if not is_escaped(view, bracket.a):
-            if view.substr(bracket) == '{':
-                count += 1
-            else:
-                count -= 1
-    return bracket
-
-def is_escaped(view, pos):
-    return any(s[0] in ('comment', 'string') for s in parsed_scope(view, pos))
-
-def is_comment(view, pos):
-    return any(s[0] == 'comment' for s in parsed_scope(view, pos))
-
-
-if ST3:
-    def line_b_begin(view, pos):
-        if view.classify(pos) & sublime.CLASS_LINE_START:
-            return newline_b(view, pos)
-        else:
-            return newline_b(view, newline_b(view, pos))
-
-    def newline_b(view, pos):
-        if pos > 0:
-            return view.find_by_class(pos, False, sublime.CLASS_LINE_START)
-
-    def newline_f(view, pos):
-        if pos < view.size():
-            return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
-else:
-    def line_b_begin(view, pos):
-        line_start = view.line(pos).begin()
-        return newline_b(view, min(pos, line_start))
-
-    def newline_b(view, pos):
-        if pos > 0:
-            return view.line(pos - 1).begin()
-
-    def newline_f(view, pos):
-        if pos < view.size():
-            region = view.find(r'^', pos + 1)
-            return region.end()

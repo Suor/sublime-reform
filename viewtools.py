@@ -112,6 +112,34 @@ def list_lines_f(view, pos):
         yield view.full_line(pos)
         pos = view.find_by_class(pos, True, sublime.CLASS_LINE_START)
 
+if ST3:
+    def line_b_begin(view, pos):
+        if view.classify(pos) & sublime.CLASS_LINE_START:
+            return newline_b(view, pos)
+        else:
+            return newline_b(view, newline_b(view, pos))
+
+    def newline_b(view, pos):
+        if pos > 0:
+            return view.find_by_class(pos, False, sublime.CLASS_LINE_START)
+
+    def newline_f(view, pos):
+        if pos < view.size():
+            return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+else:
+    def line_b_begin(view, pos):
+        line_start = view.line(pos).begin()
+        return newline_b(view, min(pos, line_start))
+
+    def newline_b(view, pos):
+        if pos > 0:
+            return view.line(pos - 1).begin()
+
+    def newline_f(view, pos):
+        if pos < view.size():
+            region = view.find(r'^', pos + 1)
+            return region.end()
+
 
 ### Blocks
 
@@ -192,6 +220,9 @@ def swap_regions(view, edit, region1, region2):
     # set cursor position/selection to match moved regions
     add_selection(view, regions)
 
+def cover_regions(regions):
+    return reduce(lambda a, b: a.cover(b), regions)
+
 
 ### Scope
 
@@ -208,6 +239,12 @@ def source(view, pos=None):
 
 def parse_scope(scope_name):
     return [name.split('.') for name in scope_name.split()]
+
+def is_escaped(view, pos):
+    return any(s[0] in ('comment', 'string') for s in parsed_scope(view, pos))
+
+def is_comment(view, pos):
+    return any(s[0] == 'comment' for s in parsed_scope(view, pos))
 
 
 ### Smarts
@@ -233,3 +270,28 @@ def expand_min_gap(view, region):
 
 def is_view_bordering(view, region):
     return region.begin() == 0 or region.end() == view.size()
+
+
+# String things
+
+def find_iter(view, pattern, pos_or_region):
+    region = pos_or_region if isinstance(pos_or_region, sublime.Region) else \
+             sublime.Region(pos_or_region, view.size())
+    start, end = region.begin(), region.end()
+    found = sublime.Region(start, start)
+    while found.a != -1:
+        found = view.find(pattern, found.b)
+        if found.b > end:
+            break
+        if not is_escaped(view, found.a):
+            yield found
+
+def count_curlies(view, region):
+    curlies = count_reps(map(view.substr, find_iter(view, r'[{}]', region)))
+    return curlies['{'] - curlies['}']
+
+def find_closing_curly(view, pos, count=1):
+    for curly in find_iter(view, r'[{}]', pos):
+        count += 1 if view.substr(curly) == '{' else -1
+        if count == 0:
+            return curly
