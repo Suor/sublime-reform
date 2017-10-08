@@ -226,19 +226,16 @@ def comments_block_at(view, pos):
 def smart_block_at(view, pos):
     lang = source(view)
     block = block_at(view, pos)
-    if lang == 'python':
+
+    # Close non-pairing curlies
+    curlies = count_curlies(view, block)
+    if curlies > 0:
+        curly = find_closing_curly(view, block.end(), count=curlies)
+        if curly is not None:
+            return block.cover(view.full_line(curly))
+    elif curlies < 0:
         return block
-    else:
-        # Close non-pairing curlies
-        curlies = count_curlies(view, block)
-        print(curlies, 'in', block)
-        if curlies > 0:
-            curly = find_closing_curly(view, block.end(), count=curlies)
-            if curly is not None:
-                return block.cover(view.full_line(curly))
-        elif curlies < 0:
-            return block
-        return block
+    return block
 
 
 def count_curlies(view, region):
