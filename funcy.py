@@ -1,6 +1,7 @@
 import re
+from collections import defaultdict
 from operator import methodcaller
-from itertools import tee, chain
+from itertools import tee, chain, islice
 try:
     from itertools import izip as zip
 except ImportError:
@@ -22,6 +23,17 @@ def last(seq):
         for item in seq:
             pass
         return item
+
+
+def nth(n, seq):
+    """Returns nth item in the sequence or None if no such item exists."""
+    try:
+        return seq[n]
+    except IndexError:
+        return None
+    except TypeError:
+        return next(islice(seq, n, None), None)
+
 
 def remove(pred, seq):
     return filter(complement(pred), seq)
@@ -47,6 +59,15 @@ def with_next(seq, fill=None):
     a, b = tee(seq)
     next(b, None)
     return zip(a, chain(b, [fill]))
+
+
+def count_reps(seq):
+    """Counts number occurrences of each value in the sequence."""
+    result = defaultdict(int)
+    for item in seq:
+        result[item] += 1
+    return result
+
 
 ### funcy strings
 

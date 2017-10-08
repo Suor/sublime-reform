@@ -225,28 +225,44 @@ def comments_block_at(view, pos):
 
 def smart_block_at(view, pos):
     lang = source(view)
-    return block_at(view, pos)
+    block = block_at(view, pos)
     if lang == 'python':
-        return block_at(view, pos)
+        return block
     else:
-        # TODO: curly block
-        block = block_at(view, pos)
-        indented = indented_block_at(view, pos)
-        return indented
-        # if block.contains(indented):
-        #     return indented.intersection(block)
+        # Close non-pairing curlies
+        curlies = count_curlies(view, block)
+        print(curlies, 'in', block)
+        if curlies > 0:
+            curly = find_closing_curly(view, block.end(), count=curlies)
+            if curly is not None:
+                return block.cover(view.full_line(curly))
+        elif curlies < 0:
+            return block
+        return block
 
 
-def indented_block_at(view, pos):
-    line_str = view.substr(view.line(pos))
-    prefix = re_find(r'^[ \t]+', line_str)
+def count_curlies(view, region):
+    curlies = count_reps(map(view.substr, find_iter(view, r'[{}]', region)))
+    return curlies['{'] - curlies['}']
 
-    def fits(line):
-        s = view.substr(line)
-        return s.isspace() or s.startswith(prefix)
+def find_closing_curly(view, pos, count=1):
+    for curly in find_iter(view, r'[{}]', pos):
+        count += 1 if view.substr(curly) == '{' else -1
+        if count == 0:
+            return curly
 
-    return cover_regions(chain(takewhile(fits, list_lines_b(view, pos)),
-                               takewhile(fits, list_lines_f(view, pos))))
+def find_iter(view, pattern, pos_or_region):
+    region = pos_or_region if isinstance(pos_or_region, sublime.Region) else \
+             sublime.Region(pos_or_region, view.size())
+    start, end = region.begin(), region.end()
+    found = sublime.Region(start, start)
+    while found.a != -1:
+        found = view.find(pattern, found.b)
+        if found.b > end:
+            break
+        if not is_escaped(view, found.a):
+            yield found
+
 
 def cover_regions(regions):
     return reduce(lambda a, b: a.cover(b), regions)
