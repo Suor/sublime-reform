@@ -311,7 +311,8 @@ def _find_iter_back(view, pattern, pos):
         base = line.begin()
         s = view.substr(line)
         for start, end in reversed(list(_re_iter_spans(regex, s))):
-            yield sublime.Region(base + start, base + end)
+            if not is_escaped(view, base + start):
+                yield sublime.Region(base + start, base + end)
 
 def _iter_lines_back(view, pos):
     yield line_start(view, pos)
