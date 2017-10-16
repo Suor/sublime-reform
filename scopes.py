@@ -76,13 +76,16 @@ def smart_down(regions, current):
 class DeleteBlockCommand(sublime_plugin.TextCommand):
      def run(self, edit):
         pos = cursor_pos(self.view)
-        block = block_at(self.view, pos)
         comments_block = comments_block_at(self.view, pos)
         # Skip one line comments
         if comments_block and self.view.substr(comments_block).count('\n') == 1:
             comments_block = None
+        block = comments_block or block_at(self.view, pos)
 
-        self.view.erase(edit, expand_min_gap(self.view, comments_block or block))
+        ex_block = expand_min_gap(self.view, block)
+        new_pos = ex_block.begin() - 1 if ex_block.begin() < block.begin() else ex_block.end()
+        set_cursor(self.view, new_pos)
+        self.view.erase(edit, ex_block)
 
 
 class ExpandNextWordCommand(sublime_plugin.TextCommand):
