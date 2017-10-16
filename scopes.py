@@ -145,7 +145,8 @@ class InlineExprCommand(sublime_plugin.TextCommand):
         line_str = self.view.substr(line)
 
         try:
-            var, expr = re_find(r'^\s*(\w+)\s*=\s*(.*)$', line_str)
+            var, expr = re_find(r'^\s*(?:\w+\s+)?(\w+)\s*=\s*(.*)$', line_str)
+            expr = expr.rstrip(';')
         except TypeError:
             return
         scope = scope_at(self.view, pos) or sublime.Region(0, self.view.size())
