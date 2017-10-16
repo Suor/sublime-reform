@@ -286,6 +286,7 @@ def find_iter(view, pattern, pos_or_region):
         if not is_escaped(view, found.a):
             yield found
 
+
 def count_curlies(view, region):
     curlies = count_reps(map(view.substr, find_iter(view, r'[{}]', region)))
     return curlies['{'] - curlies['}']
@@ -295,3 +296,38 @@ def find_closing_curly(view, pos, count=1):
         count += 1 if view.substr(curly) == '{' else -1
         if count == 0:
             return curly
+
+
+def find_opening_curly(view, pos, count=-1):
+    for curly in _find_iter_back(view, r'[{}]', pos):
+        count += 1 if view.substr(curly) == '{' else -1
+        if count == 0:
+            return curly
+
+
+def _find_iter_back(view, pattern, pos):
+    regex = re.compile(pattern)
+    for line in _iter_lines_back(view, pos):
+        base = line.begin()
+        s = view.substr(line)
+        for start, end in reversed(list(_re_iter_spans(regex, s))):
+            yield sublime.Region(base + start, base + end)
+
+def _iter_lines_back(view, pos):
+    yield line_start(view, pos)
+    pos = line_b_begin(view, pos)
+    while pos is not None:
+        line = view.full_line(pos)
+        yield line
+        pos = newline_b(view, pos)
+
+def _re_iter_spans(pattern, s):
+    regex = re.compile(pattern)
+    p = 0
+    while p < len(s):
+        m = regex.search(s, p)
+        if m is None:
+            break
+        _, e = span = m.span()
+        yield span
+        p = e + 1

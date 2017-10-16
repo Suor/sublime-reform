@@ -234,7 +234,9 @@ def smart_block_at(view, pos):
         if curly is not None:
             return block.cover(view.full_line(curly))
     elif curlies < 0:
-        return block
+        curly = find_opening_curly(view, block.begin(), count=curlies)
+        if curly is not None:
+            return block.cover(view.full_line(curly))
     return block
 
 
