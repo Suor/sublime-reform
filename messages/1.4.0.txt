@@ -1,0 +1,13 @@
+New and improved Reform just got installed:
+
+- added inline_expr command to inline expression (Alt+=)
+- balance curlies in smart select
+- smarter block deletion
+- fixed Python decorators support in latest ST3dev
+
+Also got better C-style langs support and some optimizations.
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform

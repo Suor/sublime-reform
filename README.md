@@ -25,6 +25,7 @@ select_scope_up   | ctrl+shift+; | Select block<sup>2</sup>/function/class at cu
 select_scope_down | ctrl+shift+' | Undo last select_scope_up
 delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate adjusting empty lines
 extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>4</sup>
+inline_expr       | alt+=        | Inline variable defined on line at cursor
 
 
 <sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
