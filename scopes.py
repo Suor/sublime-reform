@@ -257,11 +257,12 @@ def list_func_defs(view):
         # we add function binding to prototype or object property as part of declaration.
         funcs = view.find_all(r'([\t ]*(?:\w+ *:|(?:var +)?[\w.]+ *=) *)?function')
         is_junk = lambda r: is_escaped(view, r.a)
-        return lremove(is_junk, funcs)
+        funcs = lremove(is_junk, raw_funcs)
+        return funcs + view.find_by_selector('meta.class-method')
 
     funcs = view.find_by_selector('meta.function')
     if lang == 'python':
-        is_junk = lambda r: re_test('^(lambda|\s*\@)', view.substr(r))
+        is_junk = lambda r: re_test(r'^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
     return funcs
 
