@@ -246,6 +246,10 @@ def is_escaped(view, pos):
 def is_comment(view, pos):
     return any(s[0] == 'comment' for s in parsed_scope(view, pos))
 
+def scope_re(view, pos, pattern):
+    scope_lines = scope_name(view, pos).split()
+    return any(re.search(pattern, line) for line in scope_lines)
+
 
 ### Smarts
 

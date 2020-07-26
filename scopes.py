@@ -154,7 +154,8 @@ class InlineExprCommand(sublime_plugin.TextCommand):
         var_regions = self.view.find_all(r'\b%s\b' % var)
         var_regions = [r for r in var_regions if scope.contains(r)]
         for r in reversed(var_regions):
-            self.view.replace(edit, r, expr)
+            if not scope_re(self.view, r.begin(), '^(comment|string|variable\.parameter)'):
+                self.view.replace(edit, r, expr)
         self.view.erase(edit, self.view.full_line(pos))
 
 
