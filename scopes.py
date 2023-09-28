@@ -23,7 +23,7 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
         # print(list_defs(self.view))
 
         # scopes = [_expand_def(view, adef) for adef in list_defs(view)]
-        scopes = list_defs(self.view)
+        scopes = list_func_defs(self.view)
         set_selection(self.view, scopes)
         return
 
@@ -262,10 +262,14 @@ def list_func_defs(view):
         funcs = lremove(is_junk, raw_funcs)
         return funcs + view.find_by_selector('meta.class-method')
 
+    if lang == "nut":
+        return view.find_by_selector('entity.name.function')
+
     funcs = view.find_by_selector('meta.function')
     if lang == 'python':
         is_junk = lambda r: re_test(r'^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
+
     return funcs
 
 def list_class_defs(view):
@@ -328,7 +332,7 @@ def _expand_def(view, adef):
             else:
                 break
         return adef
-    elif lang in ('js', 'cs', 'java'):
+    elif lang in ('js', 'cs', 'java', 'nut'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
         end_bracket = find_closing_curly(view, start_bracket.b)

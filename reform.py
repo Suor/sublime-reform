@@ -145,8 +145,9 @@ def find_matching_paren(view, paren):
 
 class ExtractExprCommand(sublime_plugin.TextCommand):
     TEMPLATES = {
-        'js': ('var  = {0};\n', 4),
-        'php': (' = {0};\n', 0)
+        'js': ('let  = {0};\n', 4),
+        'php': (' = {0};\n', 0),
+        'nut': ('local  = {0};\n', 6),
     }
     DEFAULT = (' = {0}\n', 0)
 
