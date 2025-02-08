@@ -193,6 +193,8 @@ def smart_region_up(view, region):
     comments_block = comments_block_at(view, region.b)
     block = smart_block_at(view, region.begin())
     scope = scope_up(view, region)
+    if scope:
+        scope = _expand_decos(view, scope)
 
     if comments_block and not region.contains(comments_block):
         return comments_block
@@ -300,10 +302,12 @@ def scope_at(view, pos):
     return first(s for s in scopes if s.contains(pos))
 
 def scopes_up(view, pos):
-    for scope, upper in with_next(_scopes_up(view, pos)):
-        yield scope
-        if upper and not upper.contains(scope):
+    last = None
+    for scope in _scopes_up(view, pos):
+        if last is not None and not scope.contains(last):
             continue
+        yield scope
+        last = scope
 
 def _scopes_up(view, pos):
     scopes = [_expand_def(view, adef) for adef in list_defs(view)]
@@ -319,19 +323,7 @@ def _expand_def(view, adef):
 
     if lang == 'python':
         next_line = newline_f(view, adef.end())
-        adef = adef.cover(view.indented_region(next_line))
-        prefix = re_find(r'^[ \t]*', view.substr(view.line(adef.begin())))
-        while True:
-            p = line_b_begin(view, adef.begin())
-            if p is None:
-                break
-            line_b_str = view.substr(view.line(p))
-            if line_b_str.startswith(prefix) and re_test(r'meta.(annotation|\w+.decorator)',
-                    scope_name(view, p + len(prefix))):
-                adef = adef.cover(sublime.Region(p, p))
-            else:
-                break
-        return adef
+        return adef.cover(view.indented_region(next_line))
     elif lang in ('js', 'cs', 'java', 'nut'):
         # Extend to matching bracket
         start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
@@ -353,3 +345,22 @@ def _expand_def(view, adef):
         indented = view.indented_region(next_line)
         last_line = view.line(indented.end())
         return adef.cover(last_line)
+
+
+def _expand_decos(view, adef):
+    lang = source(view, adef.begin())
+
+    if lang == 'python':
+        prefix = re_find(r'^[ \t]*', view.substr(view.line(adef.begin())))
+        while True:
+            p = line_b_begin(view, adef.begin())
+            if p is None:
+                break
+            line_b_str = view.substr(view.line(p))
+            if line_b_str.startswith(prefix) and re_test(r'meta.(annotation|\w+.decorator)',
+                    scope_name(view, p + len(prefix))):
+                adef = adef.cover(sublime.Region(p, p))
+            else:
+                break
+
+    return adef
