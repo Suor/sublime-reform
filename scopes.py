@@ -17,15 +17,52 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
         pass
 
 
+def full_name(view):
+    names = []
+    for scope in scopes_up(view, cursor_pos(view)):
+        line = view.line(scope.begin())
+        line_str = view.substr(line)
+        name = re_find(r'\b(?:def|class) +(\w+)', line_str)
+        names.append(name)
+    return '.'.join(reversed(names))
+
+def package_name(view):
+    # filename = view.file_name()
+    # folders = view.window().folders()
+    # folders.sort(key=len, reverse=True)
+    # for folder in folders:
+    #     if filename.startswith(folder + "/"):
+    relpath = get_relpath(view)
+    if relpath is None:
+        return
+    module = cut_suffix(relpath, ".py").replace('/', '.')
+    return cut_prefix(module, 'web.')
+
+def get_relpath(view):
+    filename = view.file_name()
+    folders = view.window().folders()
+    folders.sort(key=len, reverse=True)
+    for folder in folders:
+        if filename.startswith(folder + "/"):
+            return cut_suffix(filename[len(folder) + 1:], ".nut")
+
+
 class ScopesTestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        print("test")
-        # print(list_defs(self.view))
+        if self.view.file_name().endswith(".py"):
+            package = package_name(self.view)
+            method_name = full_name(self.view)
+            sublime.set_clipboard('%s.%s' % (package, method_name))
+        else:
+            relpath = get_relpath(self.view)
+            if relpath:
+                sublime.set_clipboard(relpath)
+        return
 
         # scopes = [_expand_def(view, adef) for adef in list_defs(view)]
         scopes = list_func_defs(self.view)
         set_selection(self.view, scopes)
-        return
+        # return
 
         pos = cursor_pos(self.view)
         scope = region_b(scopes, pos)

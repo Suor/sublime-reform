@@ -108,6 +108,14 @@ def re_finder(regex, flags=0):
 def re_tester(regex, flags=0):
     return lambda s: bool(re.search(regex, s, flags))
 
+def cut_prefix(s, prefix):
+    """Cuts prefix from given string if it's present."""
+    return s[len(prefix):] if s.startswith(prefix) else s
+
+def cut_suffix(s, suffix):
+    """Cuts suffix from given string if it's present."""
+    return s[:-len(suffix)] if s.endswith(suffix) else s
+
 
 ### funcy funcs
 
