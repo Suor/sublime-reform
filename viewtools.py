@@ -291,6 +291,14 @@ def find_iter(view, pattern, pos_or_region):
             yield found
 
 
+def skip_parens(view, pos):
+    count = 0
+    for paren in find_iter(view, r'[()]', pos):
+        count += 1 if view.substr(paren) == '(' else -1
+        if count == 0:
+            return paren.end()
+
+
 def count_curlies(view, region):
     curlies = count_reps(map(view.substr, find_iter(view, r'[{}]', region)))
     return curlies['{'] - curlies['}']

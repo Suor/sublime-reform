@@ -326,7 +326,8 @@ def _expand_def(view, adef):
         return adef.cover(view.indented_region(next_line))
     elif lang in ('js', 'cs', 'java', 'nut'):
         # Extend to matching bracket
-        start_bracket = view.find(r'{', adef.end(), sublime.LITERAL)
+        after_parens = skip_parens(view, adef.end())
+        start_bracket = view.find(r'{', after_parens, sublime.LITERAL)
         end_bracket = find_closing_curly(view, start_bracket.b)
         adef = adef.cover(view.full_line(end_bracket))
 
