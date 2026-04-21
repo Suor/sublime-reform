@@ -24,15 +24,14 @@ select_scope_words| alt+shift+d  | Select words in function scope matching word 
 select_scope_up   | ctrl+shift+; | Select block<sup>2</sup>/function/class at cursor, select enclosing one on next hit<sup>3</sup>
 select_scope_down | ctrl+shift+' | Undo last select_scope_up
 delete_block      | ctrl+alt+d   | Delete block at cursor with appropriate adjusting empty lines
-extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>4</sup>
+extract_expr      | alt+enter    | Extract selected expression into an assignment<sup>3</sup>
 inline_expr       | alt+=        | Inline variable defined on line at cursor
 
 
 <sup>*</sup> Current key bindings are very experimental, especially on OS X. <br>
 <sup>1</sup> Matches only whole words, case-sensitive, comments and strings are skipped. <br>
 <sup>2</sup> Block is a adjacent commented lines or a blob of text surrounded with empty lines. <br>
-<sup>3</sup> Works for python, js, plain text. Tries to work for other languages. <br>
-<sup>4</sup> Works for python, js, ruby, php (and any languages with no keyword to define var).<br>
+<sup>3</sup> Works for Python, Cython, JavaScript, Lua, Squirrel. Does best effort for other languages. <br>
 
 
 ## Installation

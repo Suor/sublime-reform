@@ -59,10 +59,20 @@ class ScopesTestCommand(sublime_plugin.TextCommand):
                 sublime.set_clipboard(relpath)
         return
 
-        # scopes = [_expand_def(view, adef) for adef in list_defs(view)]
+        region = self.view.sel()[-1]
+        # if region.empty():
+        #     return
+
+        # words = get_words(self.view, region)
+
+        # filter by scope
+        # scope = scope_at(self.view, region.end()) #or block_at(self.view, region.end())
+        # set_selection(self.view, scope)
+        # return
+
         scopes = list_func_defs(self.view)
         set_selection(self.view, scopes)
-        # return
+        return
 
         pos = cursor_pos(self.view)
         scope = region_b(scopes, pos)
@@ -191,6 +201,7 @@ class InlineExprCommand(sublime_plugin.TextCommand):
         var_regions = self.view.find_all(r'\b%s\b' % var)
         var_regions = [r for r in var_regions if scope.contains(r)]
         for r in reversed(var_regions):
+            # NOTE: this not always works for all langs
             if not scope_re(self.view, r.begin(), '^(comment|string|variable\.parameter)'):
                 self.view.replace(edit, r, expr)
         self.view.erase(edit, self.view.full_line(pos))
@@ -301,11 +312,20 @@ def list_func_defs(view):
         funcs = lremove(is_junk, raw_funcs)
         return funcs + view.find_by_selector('meta.class-method')
 
-    if lang == "nut":
+    if lang == 'lua':
+        func_def = r'([\t ]*(?:local +)?[\w.]+ *=) *?\bfunction\b|(?:local +)?\bfunction\b'
+        raw_funcs = view.find_all(func_def)
+        is_junk = lambda r: is_escaped(view, r.a)
+        return lremove(is_junk, raw_funcs)
+
+    if lang == 'nut':
         return view.find_by_selector('entity.name.function')
 
     funcs = view.find_by_selector('meta.function')
-    if lang == 'python':
+
+    if lang == 'cython':
+        funcs.extend(view.find_by_selector('meta.cfunction'))
+    if lang in {'python', 'cython'}:
         is_junk = lambda r: re_test(r'^(lambda|\s*\@)', view.substr(r))
         funcs = lremove(is_junk, funcs)
 
@@ -358,10 +378,10 @@ def _scopes_up(view, pos):
 def _expand_def(view, adef):
     lang = source(view, adef.begin())
 
-    if lang == 'python':
+    if lang in {'python', 'cython'}:
         next_line = newline_f(view, adef.end())
         return adef.cover(view.indented_region(next_line))
-    elif lang in ('js', 'cs', 'java', 'nut'):
+    elif lang in {'js', 'cs', 'java', 'nut'}:
         # Extend to matching bracket
         after_parens = skip_parens(view, adef.end())
         start_bracket = view.find(r'{', after_parens, sublime.LITERAL)
@@ -378,11 +398,21 @@ def _expand_def(view, adef):
 
         return adef
     else:
+        def get_prefix(s):
+            return re_find(r'^[ \t]*', s)
+
         # Heuristics based on indentation for all other languages
+        prefix = get_prefix(view.substr(view.line(adef.begin())))
         next_line = newline_f(view, adef.end())
-        indented = view.indented_region(next_line)
-        last_line = view.line(indented.end())
-        return adef.cover(last_line)
+        match = None
+        for line in list_lines_f(view, next_line):
+            s = view.substr(line)
+            if s == "" or s.isspace():
+                continue
+            if get_prefix(s) == prefix:
+                return adef.cover(line)
+
+        return adef
 
 
 def _expand_decos(view, adef):

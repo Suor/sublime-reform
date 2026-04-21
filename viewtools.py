@@ -126,6 +126,7 @@ if ST3:
     def newline_f(view, pos):
         if pos < view.size():
             return view.find_by_class(pos, True, sublime.CLASS_LINE_START)
+        return view.size()
 else:
     def line_b_begin(view, pos):
         line_start = view.line(pos).begin()
