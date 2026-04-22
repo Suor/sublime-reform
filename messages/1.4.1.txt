@@ -1,0 +1,9 @@
+New and improved Reform just got installed:
+
+- improved JavaScript function definition detection
+- added support for JavaScript methods
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform

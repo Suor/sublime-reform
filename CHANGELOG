@@ -1,3 +1,18 @@
+1.6.0
+- support Lua and Cython
+- improve Python decorator handling in smart selection
+- improve bracket pairing for function definitions
+- add an internal draft helper to copy Python package/class paths
+
+1.5.0
+- add Squirrel support
+- prevent inline_expr from replacing names in comments, strings, and parameters
+- use let for extracted JavaScript expressions
+
+1.4.1
+- better support expression function definitions in JavaScript
+- support JavaScript methods
+
 1.4
 - added inline_expr command
 - make select_up balance curlies

@@ -1,0 +1,10 @@
+New and improved Reform just got installed:
+
+- added Lua and Cython support
+- improved Python decorator handling in smart selection
+- improved bracket pairing for function definitions
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform

@@ -1,0 +1,10 @@
+New and improved Reform just got installed:
+
+- added Squirrel support
+- made inline_expr skip comments, strings, and parameters
+- switched JavaScript extract_expr output to let
+
+
+Full list of available commands and key bindings is here:
+
+https://github.com/Suor/sublime-reform
